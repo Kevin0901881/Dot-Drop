@@ -14,9 +14,11 @@ public class DotDrop extends ApplicationAdapter {
 	private SpriteBatch batch;
 
 	public ActionResolver ar;
+	public static PlayServices playServices;
 
-	public DotDrop(ActionResolver ar) {
+	public DotDrop(ActionResolver ar, PlayServices playServices) {
 		this.ar = ar;
+		this.playServices = playServices;
 	}
 
 	@Override
@@ -24,6 +26,9 @@ public class DotDrop extends ApplicationAdapter {
 		batch = new SpriteBatch();
 		gsm = new com.kevinli.dotdropgame.states.GameStateManager();
 		Gdx.gl.glClearColor(0, 0, 0, 1);
+		if (playServices.isSignedIn()) {
+			playServices.signIn();
+		}
 		gsm.push(new com.kevinli.dotdropgame.states.Start(gsm, this)); // change this to push home screen
 		Gdx.input.setCatchBackKey(true);
 	}

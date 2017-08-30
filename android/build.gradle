@@ -19,8 +19,9 @@ android {
     }
     defaultConfig {
         applicationId "com.kevinli.dotdropgame"
-        minSdkVersion 9
+        minSdkVersion 15
         targetSdkVersion 24
+        multiDexEnabled true
     }
 }
 

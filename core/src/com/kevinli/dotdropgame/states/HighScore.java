@@ -163,6 +163,7 @@ public class HighScore extends State implements InputProcessor {
             newHS = true;
             pref.putInteger("highscore", pref.getInteger("currentHighscore"));
             pref.flush();
+            dd.playServices.submitScore(pref.getInteger("highscore"));
         }
         scoreSTxt = Integer.toString(pref.getInteger("highscore"));
         if (newHS) {
@@ -206,6 +207,31 @@ public class HighScore extends State implements InputProcessor {
         yL1 = DotDrop.HEIGHT / 2 + fontHeightScore / 2 + 95 + fontHeightL2 + 30 - 30;
         yThreeStars = DotDrop.HEIGHT / 2 + fontHeightScore / 2 + 80 + fontHeightL2 + 20 + fontHeightL1 + 20 - 30;
         sr = new ShapeRenderer();
+        if (pref.getInteger("currentHighscore") >= 1000) {
+            dd.playServices.unlockAchievement();
+            dd.playServices.showAchievement();
+        }
+        if (!pref.contains("adCounter")) {
+            pref.putInteger("adCounter", 0);
+            pref.flush();
+        }
+        pref.putInteger("adCounter", pref.getInteger("adCounter") + 1);
+        pref.flush();
+        System.out.println("adCounter: " + pref.getInteger("adCounter"));
+        if (pref.getInteger("adCounter") == 5) {
+            pref.putInteger("adCounter", 0);
+            pref.flush();
+            if (dd.ar.isWifiConnected()) {
+                dd.ar.showInterstitialAd(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("Interstitial app closed");
+                    }
+                });
+            } else {
+                System.out.println("Interstitial ad not loaded");
+            }
+        }
         Gdx.input.setInputProcessor(this);
     }
 
@@ -295,6 +321,8 @@ public class HighScore extends State implements InputProcessor {
         } else if (touchLeaderboards == 1 && leaderboardsBound.contains(screenX, DotDrop.HEIGHT - screenY)) {
             touchLeaderboards = 0;
             aLeaderboards = 1;
+
+            dd.playServices.showScore();
         } else {
             touchStart = 0;
             touchReplay = 0;

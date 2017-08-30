@@ -6,4 +6,6 @@ package com.kevinli.dotdropgame;
 
 public interface ActionResolver {
     public void shareIntent();
+    public void showInterstitialAd(Runnable then);
+    public boolean isWifiConnected();
 }
