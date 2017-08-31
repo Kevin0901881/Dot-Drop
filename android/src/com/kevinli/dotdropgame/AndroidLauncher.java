@@ -1,11 +1,16 @@
 package com.kevinli.dotdropgame;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
@@ -17,7 +22,6 @@ import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.games.Games;
 import com.google.example.games.basegameutils.GameHelper;
-import com.kevin.dotdropgame.R;
 
 import java.io.File;
 
@@ -30,6 +34,12 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+
+		hideVirtualButtons();
+
 		MobileAds.initialize(this, "ca-app-pub-4100073104591330~2983194449");
 
 		interstitialAd = new InterstitialAd(this);
@@ -187,5 +197,37 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 	@Override
 	public boolean isSignedIn() {
 		return gameHelper.isSignedIn();
+	}
+
+	@TargetApi(19)
+	private void hideVirtualButtons() {
+		getWindow().getDecorView().setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+						| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+						| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+						| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+						| View.SYSTEM_UI_FLAG_FULLSCREEN
+						| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+	}
+
+	private void hideVirtualButtons2() {
+		getWindow().getDecorView().setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+						| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+						| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+						| View.SYSTEM_UI_FLAG_FULLSCREEN
+						| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+	}
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		if (hasFocus) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+				hideVirtualButtons();
+			} else {
+				hideVirtualButtons2();
+			}
+		}
 	}
 }

@@ -86,7 +86,8 @@ public class Game extends State {
         x = rand.nextInt(920) - 70;
         setHighestN();
         gameDots = new ArrayList<com.kevinli.dotdropgame.sprites.GameDot>();
-        gameDots.add(new com.kevinli.dotdropgame.sprites.GameDot(x, com.kevinli.dotdropgame.DotDrop.HEIGHT, 0, highestN));
+        int random = generateRandom();
+        gameDots.add(new com.kevinli.dotdropgame.sprites.GameDot(x, com.kevinli.dotdropgame.DotDrop.HEIGHT, 0, random));
         passby++;
         lineBounds = new Rectangle(0, 200, com.kevinli.dotdropgame.DotDrop.WIDTH, 4);
         a = 1;
@@ -159,24 +160,6 @@ public class Game extends State {
         fpsl = new FPSLogger();
     }
 
-//    private int setX() {
-//        int newX;
-//        int hiLo = rand.nextInt(2) + 1;
-//        if (x - 300 < -70) {
-//            newX = rand.nextInt(850 - x + 1) + x;
-//        } else if (x + 300 > 850) {
-//            newX = rand.nextInt(x + 70 + 1) - 70;
-//        } else {
-//            if (hiLo == 1) {
-//                newX = rand.nextInt(850 - x + 1) + x;
-//            } else {
-//                newX = rand.nextInt(x + 70 + 1) - 70;
-//            }
-//        }
-//
-//        return newX;
-//    }
-
     @Override
     protected void handleInput() {
         if(Gdx.input.justTouched()) {
@@ -229,9 +212,10 @@ public class Game extends State {
                 distanceY = rand.nextInt(Y_SPACING_MAX - Y_SPACING_MIN + 1) + Y_SPACING_MIN;
                 x = rand.nextInt(920) - 70;
                 if (passby == 5) {                                                                  // Change this to affect number of dots that pass by before same color appears
-                    gameDots.add(new com.kevinli.dotdropgame.sprites.GameDot(x, com.kevinli.dotdropgame.DotDrop.HEIGHT, n, highestN));
+                    gameDots.add(new com.kevinli.dotdropgame.sprites.GameDot(x, com.kevinli.dotdropgame.DotDrop.HEIGHT, n, 0));
                 } else {
-                    gameDots.add(new com.kevinli.dotdropgame.sprites.GameDot(x, com.kevinli.dotdropgame.DotDrop.HEIGHT, 0, highestN));
+                    int random = generateRandom();
+                    gameDots.add(new com.kevinli.dotdropgame.sprites.GameDot(x, com.kevinli.dotdropgame.DotDrop.HEIGHT, 0, random));
                 }
                 if (n == gameDots.get(gameDots.size() - 1).getn()) {
                     passby = 0;

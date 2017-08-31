@@ -211,13 +211,8 @@ public class HighScore extends State implements InputProcessor {
             dd.playServices.unlockAchievement();
             dd.playServices.showAchievement();
         }
-        if (!pref.contains("adCounter")) {
-            pref.putInteger("adCounter", 0);
-            pref.flush();
-        }
         pref.putInteger("adCounter", pref.getInteger("adCounter") + 1);
         pref.flush();
-        System.out.println("adCounter: " + pref.getInteger("adCounter"));
         if (pref.getInteger("adCounter") == 5) {
             pref.putInteger("adCounter", 0);
             pref.flush();
@@ -366,7 +361,6 @@ public class HighScore extends State implements InputProcessor {
         if (touchStart == 2) {
             fade(false);
             if (a >= 1) {
-                System.out.println("highscore");
                 gsm.set(new Start(gsm, dd));
             }
         } else if (touchReplay == 2) {
@@ -497,6 +491,5 @@ public class HighScore extends State implements InputProcessor {
         if (yThreeStars >= DotDrop.HEIGHT / 2 + fontHeightScore / 2 + 80 + fontHeightL2 + 20 + fontHeightL1 + 20) {
             yThreeStars = DotDrop.HEIGHT / 2 + fontHeightScore / 2 + 80 + fontHeightL2 + 20 + fontHeightL1 + 20;
         }
-        System.out.println(transition);
     }
 }
