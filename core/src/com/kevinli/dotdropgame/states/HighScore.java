@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.kevinli.dotdropgame.DotDrop;
@@ -105,6 +106,8 @@ public class HighScore extends State implements InputProcessor {
     private boolean transition;
 
     private DotDrop dd;
+
+    private Vector3 touch;
 
     protected HighScore(GameStateManager gsm, DotDrop dd) {
         super(gsm);
@@ -228,6 +231,7 @@ public class HighScore extends State implements InputProcessor {
             }
         }
         Gdx.input.setInputProcessor(this);
+        touch = new Vector3();
     }
 
     @Override
@@ -250,22 +254,25 @@ public class HighScore extends State implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (startBound.contains(screenX, DotDrop.HEIGHT - screenY) && touchStart == 0) {
+        touch.set(screenX, screenY, 0);
+        cam.unproject(touch);
+        System.out.println("X: " + touch.x + " Y: " + touch.y);
+        if (startBound.contains(touch.x, touch.y) && touchStart == 0) {
             touchStart = 1;
             aStart = 0.5f;
-        } else if (replayBound.contains(screenX, DotDrop.HEIGHT - screenY) && touchReplay == 0) {
+        } else if (replayBound.contains(touch.x, touch.y) && touchReplay == 0) {
             touchReplay = 1;
             aReplay = 0.5f;
-        } else if (volumeBound.contains(screenX, DotDrop.HEIGHT - screenY) && touchVolume == 0) {
+        } else if (volumeBound.contains(touch.x, touch.y) && touchVolume == 0) {
             touchVolume = 1;
             aVolume = 0.5f;
-        } else if (shareBound.contains(screenX, DotDrop.HEIGHT - screenY) && touchShare == 0) {
+        } else if (shareBound.contains(touch.x, touch.y) && touchShare == 0) {
             touchShare = 1;
             aShare = 0.5f;
-        } else if (rateBound.contains(screenX, DotDrop.HEIGHT - screenY) && touchRate == 0) {
+        } else if (rateBound.contains(touch.x, touch.y) && touchRate == 0) {
             touchRate = 1;
             aRate = 0.5f;
-        } else if (leaderboardsBound.contains(screenX, DotDrop.HEIGHT - screenY) && touchLeaderboards == 0) {
+        } else if (leaderboardsBound.contains(touch.x, touch.y) && touchLeaderboards == 0) {
             touchLeaderboards = 1;
             aLeaderboards = 0.5f;
         }
@@ -274,13 +281,15 @@ public class HighScore extends State implements InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (touchStart == 1 && startBound.contains(screenX, DotDrop.HEIGHT - screenY)) {
+        touch.set(screenX, screenY, 0);
+        cam.unproject(touch);
+        if (touchStart == 1 && startBound.contains(touch.x, touch.y)) {
             touchStart = 2;
             aStart = 1;
-        } else if (touchReplay == 1 && replayBound.contains(screenX, DotDrop.HEIGHT - screenY)) {
+        } else if (touchReplay == 1 && replayBound.contains(touch.x, touch.y)) {
             touchReplay = 2;
             aReplay = 1;
-        } else if (touchVolume == 1 && volumeBound.contains(screenX, DotDrop.HEIGHT - screenY)) {
+        } else if (touchVolume == 1 && volumeBound.contains(touch.x, touch.y)) {
             if (pref.getInteger("volume") == 1) {
                 pref.putInteger("volume", 2);
                 volumeSprite.setTexture(muted);
@@ -297,7 +306,7 @@ public class HighScore extends State implements InputProcessor {
             }
             touchVolume = 0;
             aVolume = 1;
-        } else if (touchShare == 1 && shareBound.contains(screenX, DotDrop.HEIGHT - screenY)) {
+        } else if (touchShare == 1 && shareBound.contains(touch.x, touch.y)) {
             touchShare = 0;
             aShare = 1;
 
@@ -308,12 +317,12 @@ public class HighScore extends State implements InputProcessor {
             pixmap.dispose();
 
             dd.ar.shareIntent();
-        } else if (touchRate == 1 && rateBound.contains(screenX, DotDrop.HEIGHT - screenY)) {
+        } else if (touchRate == 1 && rateBound.contains(touch.x, touch.y)) {
             touchRate = 0;
             aRate = 1;
 
             Gdx.net.openURI("market://details?id=com.kevinli.dotdropgame");
-        } else if (touchLeaderboards == 1 && leaderboardsBound.contains(screenX, DotDrop.HEIGHT - screenY)) {
+        } else if (touchLeaderboards == 1 && leaderboardsBound.contains(touch.x, touch.y)) {
             touchLeaderboards = 0;
             aLeaderboards = 1;
 
@@ -424,7 +433,7 @@ public class HighScore extends State implements InputProcessor {
         gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         sr.begin(ShapeRenderer.ShapeType.Filled);
         sr.setColor(0.03f, 0.03f, 0.03f, a);
-        sr.rect(0, 0, DotDrop.WIDTH, DotDrop.HEIGHT);
+        sr.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 //        sr.setColor(Color.YELLOW);
 //        sr.rect(shareBound.getX(), shareBound.getY(), shareBound.getWidth(), shareBound.getHeight());
 //        sr.setColor(Color.RED);
@@ -438,12 +447,19 @@ public class HighScore extends State implements InputProcessor {
 
     @Override
     public void dispose() {
+        shareSprite.getTexture().dispose();
         share.dispose();
+        rateSprite.getTexture().dispose();
         rate.dispose();
+        leaderboardsSprite.getTexture().dispose();
         leaderboards.dispose();
+        volumeSprite.getTexture().dispose();
         volume.dispose();
+        threestarSprite.getTexture().dispose();
         threestars.dispose();
+        startSprite.getTexture().dispose();
         start.dispose();
+        replaySprite.getTexture().dispose();
         replay.dispose();
         fontS.dispose();
         fontL.dispose();

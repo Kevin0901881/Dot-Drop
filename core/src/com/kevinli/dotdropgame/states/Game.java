@@ -191,8 +191,9 @@ public class Game extends State {
     @Override
     public void update(float dt) {
         handleInput();
-        fade(true);
-        if (a <= 0) {
+        if (a > 0) {
+            fade(true);
+        } else {
             for (com.kevinli.dotdropgame.sprites.GameDot dots : gameDots) {
                 dots.update(dt);
             }
@@ -256,7 +257,7 @@ public class Game extends State {
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             sr.begin(ShapeRenderer.ShapeType.Filled);
             sr.setColor(0.03f, 0.03f, 0.03f, a);
-            sr.rect(0, 0, com.kevinli.dotdropgame.DotDrop.WIDTH, com.kevinli.dotdropgame.DotDrop.HEIGHT);
+            sr.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             sr.end();
             Gdx.gl.glDisable(GL20.GL_BLEND);
         }

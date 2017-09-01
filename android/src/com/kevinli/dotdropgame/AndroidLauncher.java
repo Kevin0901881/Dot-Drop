@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -16,6 +15,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
+import com.badlogic.gdx.utils.BufferUtils;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -36,7 +39,7 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 
 		hideVirtualButtons();
 
@@ -87,7 +90,16 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 
 	@Override
 	public void shareIntent() {
-		String path = new FileHandle(Gdx.files.getLocalStoragePath() + "screenshot.png").toString();
+		byte[] pixels = ScreenUtils.getFrameBufferPixels(0, 0, Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), true);
+
+		try {
+			Pixmap pixmap = new Pixmap(Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), Pixmap.Format.RGBA8888);
+			BufferUtils.copy(pixels, 0, pixmap.getPixels(), pixels.length);
+			PixmapIO.writePNG(Gdx.files.external("Android/data/com.kevinli.dotdropgame/screenshots/screenshot.png"), pixmap);
+			pixmap.dispose();
+		} catch (Exception e) {}
+
+		String path = new FileHandle(Gdx.files.getExternalStoragePath() + "Android/data/com.kevinli.dotdropgame/screenshots/screenshot.png").toString();
 		File file = new File(path);
 
 		String message = "Check out my score in Dot Drop! Think you can beat me? Download the game here: https://play.google.com/store/apps/details?id=com.kevinli.dotdropgame";
@@ -186,7 +198,7 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 
 	@Override
 	public void showScore() {
-		if (isSignedIn() == true) {
+		if (isSignedIn()) {
 			startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(),
 					getString(R.string.highest_score)), requestCode);
 		} else {
@@ -210,24 +222,11 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 						| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 	}
 
-	private void hideVirtualButtons2() {
-		getWindow().getDecorView().setSystemUiVisibility(
-				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-						| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-						| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-						| View.SYSTEM_UI_FLAG_FULLSCREEN
-						| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-	}
-
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
 		if (hasFocus) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-				hideVirtualButtons();
-			} else {
-				hideVirtualButtons2();
-			}
+			hideVirtualButtons();
 		}
 	}
 }

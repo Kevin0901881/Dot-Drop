@@ -1,8 +1,10 @@
 package com.kevinli.dotdropgame.sprites;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
+import com.kevinli.dotdropgame.DotDrop;
 
 /**
  * Created by Kevin on 7/11/2017.
@@ -10,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class StartDot {
     private static final int GRAVITY = -110;
+    private static final float FACTOR = (float) Gdx.graphics.getWidth() / DotDrop.WIDTH;
     private Vector2 position;
     private Vector2 velocity;
     private Texture dot;

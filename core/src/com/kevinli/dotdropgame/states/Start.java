@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.kevinli.dotdropgame.DotDrop;
 
 /**
@@ -17,6 +18,7 @@ import com.kevinli.dotdropgame.DotDrop;
  */
 
 public class Start extends State implements InputProcessor{
+
     private com.kevinli.dotdropgame.sprites.StartDot dot;
     private Unlocks unlocks;
 
@@ -32,9 +34,7 @@ public class Start extends State implements InputProcessor{
     private Vector2 firstTouch;
     private Vector2 original;
     private Vector2 delta;
-    private Vector2 velocity;
-    private Vector2 velocity2;
-    private Vector2 velocity3;
+    private Vector2[] velocity;
     // Distance between touch coordinate and coordinate of ball,
     // stored so that ball position can be set when dragged
     private Vector2 touchDownDelta;
@@ -55,6 +55,8 @@ public class Start extends State implements InputProcessor{
     private Preferences pref;
     private DotDrop dd;
 
+    private Vector3 touch;
+
     public Start(GameStateManager gsm, DotDrop dd) {
         super(gsm);
         pref = Gdx.app.getPreferences("com.kevin.dotdropgame.settings");
@@ -67,9 +69,10 @@ public class Start extends State implements InputProcessor{
         firstTouch = new Vector2(0, 0);
         original = new Vector2(0, 0);
         delta = new Vector2(0, 0);
-        velocity = new Vector2(0, 0);
-        velocity2 = new Vector2(0, 0);
-        velocity3 = new Vector2(0, 0);
+        velocity = new Vector2[10];
+        for (int i = 0; i < 10; i++) {
+            velocity[i] = new Vector2(0, 0);
+        }
         touchDownDelta = new Vector2(0, 0);
         tDownDots = new boolean[15];
         wordmark = new Texture("wordmark.png");
@@ -86,6 +89,7 @@ public class Start extends State implements InputProcessor{
         downarrows.setAlpha(0.4f);
         cam.setToOrtho(false, DotDrop.WIDTH, DotDrop.HEIGHT);
         Gdx.input.setInputProcessor(this);
+        touch = new Vector3();
     }
 
     @Override
@@ -158,7 +162,7 @@ public class Start extends State implements InputProcessor{
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         sr.begin(ShapeRenderer.ShapeType.Filled);
         sr.setColor(0.03f, 0.03f, 0.03f, a);
-        sr.rect(0, 0, DotDrop.WIDTH, DotDrop.HEIGHT);
+        sr.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         sr.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
 //        sr.begin(ShapeRenderer.ShapeType.Filled);
@@ -172,8 +176,11 @@ public class Start extends State implements InputProcessor{
 
     @Override
     public void dispose() {
+        wordmarks.getTexture().dispose();
         wordmark.dispose();
+        text2s.getTexture().dispose();
         text2.dispose();
+        downarrows.getTexture().dispose();
         downarrow.dispose();
         unlocks.dispose();
         sr.dispose();
@@ -200,23 +207,25 @@ public class Start extends State implements InputProcessor{
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (dot.getBounds().contains(screenX, DotDrop.HEIGHT - screenY) && openUnlock != 1) {
+        touch.set(screenX, screenY, 0);
+        cam.unproject(touch);
+        if (dot.getBounds().contains(touch.x, touch.y) && openUnlock != 1) {
             tDown = true;
-            firstTouch.set(screenX, screenY);
-            original.set(screenX, screenY);
-            touchDownDelta.set(screenX - dot.getPosition().x,
-                    DotDrop.HEIGHT - screenY - dot.getPosition().y);
+            firstTouch.set(touch.x, touch.y);
+            original.set(touch.x, touch.y);
+            touchDownDelta.set(touch.x - dot.getPosition().x,
+                    touch.y - dot.getPosition().y);
         }
 
-        if (unlocks.getBounds().get(1).contains(screenX, DotDrop.HEIGHT - screenY) && openUnlock != 1) {
+        if (unlocks.getBounds().get(1).contains(touch.x, touch.y) && openUnlock != 1) {
             tDownU = true;
-        } else if (unlocks.getBackBounds().contains(screenX, DotDrop.HEIGHT - screenY)) {
+        } else if (unlocks.getBackBounds().contains(touch.x, touch.y)) {
             tDownU2 = true;
         }
 
         if (openUnlock == 1) {
             for (int i = 0; i < 15; i++) {
-                if (unlocks.getBounds().get(i).contains(screenX, DotDrop.HEIGHT - screenY)) {
+                if (unlocks.getBounds().get(i).contains(touch.x, touch.y)) {
                     tDownDots[i] = true;
                     dotSelect = i;
                 }
@@ -236,14 +245,33 @@ public class Start extends State implements InputProcessor{
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        touch.set(screenX, screenY, 0);
+        cam.unproject(touch);
         if (tDown) {
+            Vector2 total = new Vector2();
             tDown = false;
             dot.setTDown(tDown);
-            dot.dotFling((velocity2.x + velocity3.x) / 2, -(velocity2.y + velocity3.y) / 2);
+            for (int i = 0; i < 10; i++) {
+                total.add(velocity[i]);
+            }
+            total.scl((float) 1/10);
+            System.out.println("x: " + delta.x + " y: " + delta.y);
+            System.out.println("x: " + velocity[1].x + " y: " + velocity[1].y);
+            System.out.println("x: " + velocity[2].x + " y: " + velocity[2].y);
+            System.out.println("x: " + velocity[3].x + " y: " + velocity[3].y);
+            System.out.println("x: " + velocity[4].x + " y: " + velocity[4].y);
+            System.out.println("x: " + velocity[5].x + " y: " + velocity[5].y);
+            System.out.println("x: " + velocity[6].x + " y: " + velocity[6].y);
+            System.out.println("x: " + velocity[7].x + " y: " + velocity[7].y);
+            System.out.println("x: " + velocity[8].x + " y: " + velocity[8].y);
+            System.out.println("x: " + velocity[8].x + " y: " + velocity[8].y);
+            System.out.println("x: " + velocity[9].x + " y: " + velocity[9].y);
+            System.out.println("total.x: " + total.x + " total.y: " + total.y);
+            dot.dotFling(total.x, total.y);
         }
         tDown = false;
 
-        if (tDownU && unlocks.getBounds().get(1).contains(screenX, DotDrop.HEIGHT - screenY)) {
+        if (tDownU && unlocks.getBounds().get(1).contains(touch.x, touch.y)) {
 //            if (openUnlock == 0 || openUnlock == 2) {
 //                openUnlock = 1;
 //            } else {
@@ -255,14 +283,14 @@ public class Start extends State implements InputProcessor{
             tDownU = false;
         }
 
-        if (tDownU2 && unlocks.getBackBounds().contains(screenX, DotDrop.HEIGHT - screenY)) {
+        if (tDownU2 && unlocks.getBackBounds().contains(touch.x, touch.y)) {
             openUnlock = 2;
             tDownU2 = false;
         } else {
             tDownU2 = false;
         }
 
-        if (openUnlock == 1 && tDownDots[dotSelect] && unlocks.getBounds().get(dotSelect).contains(screenX, DotDrop.HEIGHT - screenY)) {
+        if (openUnlock == 1 && tDownDots[dotSelect] && unlocks.getBounds().get(dotSelect).contains(touch.x, touch.y)) {
             unlocks.setSelected(unlocks.getDotNames()[dotSelect]);
             tDownDots[dotSelect] = false;
         }
@@ -272,26 +300,49 @@ public class Start extends State implements InputProcessor{
     // TODO: Fling feels a bit weird, maybe decrease update rate
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+        touch.set(screenX, screenY, 0);
+        cam.unproject(touch);
         float dt = Gdx.graphics.getDeltaTime();
         if (tDown) {
             dot.setTDown(tDown);
             dot.setTDragged(true);
-            Vector2 currentTouch = new Vector2(screenX, screenY);
+            Vector2 currentTouch = new Vector2(touch.x, touch.y);
             delta.set(currentTouch.cpy().sub(firstTouch));
             firstTouch.set(currentTouch);
-            if (velocity.x == 0 && velocity.y == 0) {
-                velocity.set(delta.x / dt, delta.y / dt);
-            } else if (velocity2.x == 0 && velocity2.y == 0) {
-                velocity2.set(delta.x / dt, delta.y / dt);
-            } else if (velocity3.x == 0 && velocity3.y == 0) {
-                velocity3.set(delta.x / dt, delta.y / dt);
+            if (velocity[0].x == 0 && velocity[0].y == 0) {
+                velocity[0].set(delta.x / dt, delta.y / dt);
+            } else if (velocity[1].x == 0 && velocity[1].y == 0) {
+                velocity[1].set(delta.x / dt, delta.y / dt);
+            } else if (velocity[2].x == 0 && velocity[2].y == 0) {
+                velocity[2].set(delta.x / dt, delta.y / dt);
+            } else if (velocity[3].x == 0 && velocity[3].y == 0) {
+                velocity[3].set(delta.x / dt, delta.y / dt);
+            } else if (velocity[4].x == 0 && velocity[4].y == 0) {
+                velocity[4].set(delta.x / dt, delta.y / dt);
+            } else if (velocity[5].x == 0 && velocity[5].y == 0) {
+                velocity[5].set(delta.x / dt, delta.y / dt);
+            } else if (velocity[6].x == 0 && velocity[6].y == 0) {
+                velocity[6].set(delta.x / dt, delta.y / dt);
+            } else if (velocity[7].x == 0 && velocity[7].y == 0) {
+                velocity[7].set(delta.x / dt, delta.y / dt);
+            } else if (velocity[8].x == 0 && velocity[8].y == 0) {
+                velocity[8].set(delta.x / dt, delta.y / dt);
+            } else if (velocity[9].x == 0 && velocity[9].y == 0) {
+                velocity[9].set(delta.x / dt, delta.y / dt);
             } else {
-                velocity = velocity2;
-                velocity2 = velocity3;
-                velocity3.set(delta.x / dt, delta.y / dt);
+                velocity[0] = velocity[1];
+                velocity[1] = velocity[2];
+                velocity[2] = velocity[3];
+                velocity[3] = velocity[4];
+                velocity[4] = velocity[5];
+                velocity[5] = velocity[6];
+                velocity[6] = velocity[7];
+                velocity[7] = velocity[8];
+                velocity[8] = velocity[9];
+                velocity[9].set(delta.x / dt, delta.y / dt);
             }
-            dot.setPosition(screenX - touchDownDelta.x,
-                    DotDrop.HEIGHT - screenY - touchDownDelta.y);
+            dot.setPosition(touch.x - touchDownDelta.x,
+                    touch.y - touchDownDelta.y);
         }
 
 //        if (tDownU) {
