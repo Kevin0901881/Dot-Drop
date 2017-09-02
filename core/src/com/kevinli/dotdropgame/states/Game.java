@@ -49,6 +49,7 @@ public class Game extends State {
     private int x;
 
     private ArrayList<GameDot> gameDots;
+    private float[] v;
 
     private int distanceY;
     private int passby = 0;
@@ -64,15 +65,25 @@ public class Game extends State {
 
     private int score = 0;
     private String scoreStr;
+    private String message = "Tap when the line overlaps";
+    private String message2 = "the dot of the same color";
 
     private BitmapFont font;
+    private BitmapFont fontMessage;
     private GlyphLayout gl;
+    private GlyphLayout glMessage;
+    private GlyphLayout glMessage2;
     private float fontWidth;
+    private float fontMessageWidth;
+    private float fontMessage2Width;
     private float fontHeight;
+    private float fontMessageHeight;
+    private float fontMessage2Height;
 
     private ShapeRenderer sr;
 
     private float a;
+    private float aMessage = 0;
 
     private Sound hit;
     private Sound lose;
@@ -83,6 +94,9 @@ public class Game extends State {
 
     private AssetManager assets;
     private TextureAtlas atlas;
+
+    private boolean runTutorial;
+    private boolean paused;
 
     public Game(GameStateManager gsm, DotDrop dd) {
         super(gsm);
@@ -153,11 +167,21 @@ public class Game extends State {
         }
         cam.setToOrtho(false, DotDrop.WIDTH, DotDrop.HEIGHT);
         font = new BitmapFont(Gdx.files.internal("muli.fnt"));
+        fontMessage = new BitmapFont(Gdx.files.internal("mulisemi.fnt"));
         font.setColor(1, 1, 1, 0.2f);
+        fontMessage.setColor(1, 1, 1, aMessage);
         gl = new GlyphLayout();
+        glMessage = new GlyphLayout();
+        glMessage2 = new GlyphLayout();
         gl.setText(font, scoreStr);
+        glMessage.setText(fontMessage, message);
+        glMessage2.setText(fontMessage, message2);
         fontWidth = gl.width;
         fontHeight = gl.height;
+        fontMessageWidth = glMessage.width;
+        fontMessageHeight = glMessage.height;
+        fontMessage2Width = glMessage2.width;
+        fontMessage2Height = glMessage2.height;
         hit = Gdx.audio.newSound(Gdx.files.internal("dotsfx.mp3"));
         lose = Gdx.audio.newSound(Gdx.files.internal("losesfx.mp3"));
         if (!pref.contains("currentHighscore")) {
@@ -170,6 +194,16 @@ public class Game extends State {
         }
         distanceY = rand.nextInt(Y_SPACING_MAX - Y_SPACING_MIN + 1) + Y_SPACING_MIN;
         fpsl = new FPSLogger();
+
+        if (!pref.contains("tutorial")) {
+            pref.putInteger("tutorial", 1);
+            pref.flush();
+            runTutorial = true;
+        } else if (pref.getInteger("tutorial") == 0) {
+            pref.putInteger("tutorial", 1);
+            pref.flush();
+            runTutorial = true;
+        }
     }
 
     @Override
@@ -196,6 +230,11 @@ public class Game extends State {
                     }
                     gsm.set(new HighScore(gsm, dd));
                 }
+                if (runTutorial && dots.getBounds().overlaps(lineBounds) && dots.getn() == n) {
+                    runTutorial = false;
+                    paused = false;
+                    resume();
+                }
             }
         }
     }
@@ -207,7 +246,14 @@ public class Game extends State {
             fade(true);
         } else {
             for (GameDot dots : gameDots) {
-                dots.update(dt);
+                if ((runTutorial && dots.getBounds().overlaps(lineBounds) && dots.getn() == n) || paused) {
+                    if (dots.getn() == n && dots.getBounds().overlaps(lineBounds)) {
+                        paused = true;
+                        pause();
+                    }
+                } else {
+                    dots.update(dt);
+                }
             }
 
             if (gameDots.get(0).getPosition().y < -300 && gameDots.get(0).getn() == n &&
@@ -256,6 +302,10 @@ public class Game extends State {
         }
         sb.draw(line, 0, 200);
         sb.draw(minidot, 25, 1830, 65, 65);                                                         // Change y-coordinate to match viewport height (1835)
+        fontMessage.draw(sb, message, DotDrop.WIDTH / 2 - fontMessageWidth / 2,
+                140);
+        fontMessage.draw(sb, message2, DotDrop.WIDTH / 2 - fontMessage2Width / 2,
+                90);
         sb.end();
 //        sr.begin(ShapeRenderer.ShapeType.Filled);
 //        sr.setColor(Color.YELLOW);
@@ -279,6 +329,7 @@ public class Game extends State {
     public void dispose() {
         hit.dispose();
         font.dispose();
+        fontMessage.dispose();
         line.dispose();
         minidot.dispose();
         lose.dispose();
@@ -412,5 +463,15 @@ public class Game extends State {
                 a = 1;
             }
         }
+    }
+
+    private void pause() {
+        aMessage = 1;
+        fontMessage.setColor(1, 1, 1, aMessage);
+    }
+
+    private void resume() {
+        aMessage = 0;
+        fontMessage.setColor(1, 1, 1, aMessage);
     }
 }

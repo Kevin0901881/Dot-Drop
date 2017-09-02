@@ -37,6 +37,7 @@ public class HighScore extends State implements InputProcessor {
     private Texture threestars;
     private Texture start;
     private Texture replay;
+    private Texture help;
 
     private Sprite threestarSprite;
     private Sprite startSprite;
@@ -45,6 +46,7 @@ public class HighScore extends State implements InputProcessor {
     private Sprite rateSprite;
     private Sprite leaderboardsSprite;
     private Sprite volumeSprite;
+    private Sprite helpSprite;
 
     private Rectangle shareBound;
     private Rectangle rateBound;
@@ -52,6 +54,7 @@ public class HighScore extends State implements InputProcessor {
     private Rectangle volumeBound;
     private Rectangle startBound;
     private Rectangle replayBound;
+    private Rectangle helpBound;
 
     private BitmapFont fontS;
     private BitmapFont fontL;
@@ -87,6 +90,7 @@ public class HighScore extends State implements InputProcessor {
     private float aRate = 1;
     private float aLeaderboards = 1;
     private float aVolume = 1;
+    private float aHelp = 1;
 
     private float yL1;
     private float yL2;
@@ -98,6 +102,7 @@ public class HighScore extends State implements InputProcessor {
     private int touchRate = 0;
     private int touchLeaderboards = 0;
     private int touchVolume = 0;
+    private int touchHelp = 0;
 
     private ShapeRenderer sr;
 
@@ -121,6 +126,7 @@ public class HighScore extends State implements InputProcessor {
         threestars = new Texture("threestars.png");
         start = new Texture("start.png");
         replay = new Texture("replay.png");
+        help = new Texture("help.png");
 
         threestarSprite = new Sprite(threestars);
         threestarSprite.setAlpha(a2);
@@ -140,6 +146,8 @@ public class HighScore extends State implements InputProcessor {
             volumeSprite = new Sprite(muted);
         }
         volumeSprite.setAlpha(1);
+        helpSprite = new Sprite(help);
+        helpSprite.setAlpha(1);
 
         shareBound = new Rectangle(20, DotDrop.HEIGHT - 138, 40 + share.getWidth(), 40 + share.getHeight());
         rateBound = new Rectangle(60 + share.getWidth(),
@@ -153,6 +161,8 @@ public class HighScore extends State implements InputProcessor {
             volumeBound = new Rectangle(140 + share.getWidth() + rate.getWidth() + leaderboards.getWidth(),
                     DotDrop.HEIGHT - 138, 40 + muted.getWidth(), 40 + muted.getHeight());
         }
+        helpBound = new Rectangle(180 + share.getWidth() + rate.getWidth() + leaderboards.getWidth() + volume.getWidth(),
+                DotDrop.HEIGHT - 138, 40 + help.getWidth(), 40 + help.getHeight());
         startBound = new Rectangle(DotDrop.WIDTH / 2 - 60 - start.getWidth() - 20,
                 DotDrop.HEIGHT / 6 - start.getHeight() - 20, 40 + start.getWidth(), 40 + start.getHeight());
         replayBound = new Rectangle(DotDrop.WIDTH / 2 + 40, DotDrop.HEIGHT / 6 - start.getHeight() - 20,
@@ -274,6 +284,9 @@ public class HighScore extends State implements InputProcessor {
         } else if (leaderboardsBound.contains(touch.x, touch.y) && touchLeaderboards == 0) {
             touchLeaderboards = 1;
             aLeaderboards = 0.5f;
+        } else if (helpBound.contains(touch.x, touch.y) && touchHelp == 0) {
+            touchHelp = 1;
+            aHelp = 0.5f;
         }
         return true;
     }
@@ -326,6 +339,12 @@ public class HighScore extends State implements InputProcessor {
             aLeaderboards = 1;
 
             dd.playServices.showScore();
+        } else if (touchHelp == 1 && helpBound.contains(touch.x, touch.y)) {
+            touchHelp = 0;
+            aHelp = 1;
+            pref.putInteger("tutorial", 0);
+            pref.flush();
+            gsm.set(new Game(gsm, dd));
         } else {
             touchStart = 0;
             touchReplay = 0;
@@ -374,7 +393,7 @@ public class HighScore extends State implements InputProcessor {
         } else if (touchReplay == 2) {
             fade(false);
             if (a >= 1) {
-                gsm.set(new com.kevinli.dotdropgame.states.Game(gsm, dd));
+                gsm.set(new Game(gsm, dd));
             }
         } else {
             fade(true);
@@ -415,16 +434,20 @@ public class HighScore extends State implements InputProcessor {
         rateSprite.setPosition(80 + share.getWidth(), DotDrop.HEIGHT - 118);
         leaderboardsSprite.setPosition(120 + share.getWidth() + rate.getWidth(), DotDrop.HEIGHT - 118);
         volumeSprite.setPosition(160 + share.getWidth() + rate.getWidth() + leaderboards.getWidth(), DotDrop.HEIGHT - 118);
+        helpSprite.setPosition(200 + share.getWidth() + rate.getWidth() + leaderboards.getWidth() + volume.getWidth(),
+                DotDrop.HEIGHT - 118);
         startSprite.setAlpha(aStart);
         replaySprite.setAlpha(aReplay);
         shareSprite.setAlpha(aShare);
         rateSprite.setAlpha(aRate);
         leaderboardsSprite.setAlpha(aLeaderboards);
         volumeSprite.setAlpha(aVolume);
+        helpSprite.setAlpha(aHelp);
         shareSprite.draw(sb);
         rateSprite.draw(sb);
         leaderboardsSprite.draw(sb);
         volumeSprite.draw(sb);
+        helpSprite.draw(sb);
         startSprite.draw(sb);
         replaySprite.draw(sb);
         sb.end();
@@ -454,6 +477,8 @@ public class HighScore extends State implements InputProcessor {
         leaderboards.dispose();
         volumeSprite.getTexture().dispose();
         volume.dispose();
+        helpSprite.getTexture().dispose();
+        help.dispose();
         threestarSprite.getTexture().dispose();
         threestars.dispose();
         startSprite.getTexture().dispose();

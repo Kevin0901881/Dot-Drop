@@ -76,11 +76,19 @@ public class GameDot {
         return touched;
     }
 
+    public float getVelocity() {
+        return velocity.y;
+    }
+
     public boolean getCleared() {
         return cleared;
     }
 
     public void setCleared(boolean clear) {
         cleared = clear;
+    }
+
+    public void setVelocity(float v) {
+        velocity.y = v;
     }
 }
