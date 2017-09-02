@@ -2,6 +2,7 @@ package com.kevinli.dotdropgame.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
@@ -9,8 +10,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.kevinli.dotdropgame.DotDrop;
+import com.kevinli.dotdropgame.sprites.GameDot;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -44,7 +48,7 @@ public class Game extends State {
 
     private int x;
 
-    private ArrayList<com.kevinli.dotdropgame.sprites.GameDot> gameDots;
+    private ArrayList<GameDot> gameDots;
 
     private int distanceY;
     private int passby = 0;
@@ -75,21 +79,29 @@ public class Game extends State {
 
     private FPSLogger fpsl;
 
-    private com.kevinli.dotdropgame.DotDrop dd;
+    private DotDrop dd;
 
-    public Game(GameStateManager gsm, com.kevinli.dotdropgame.DotDrop dd) {
+    private AssetManager assets;
+    private TextureAtlas atlas;
+
+    public Game(GameStateManager gsm, DotDrop dd) {
         super(gsm);
         pref = Gdx.app.getPreferences("com.kevin.dotdropgame.settings");
+        assets = new AssetManager();
+        assets.load("dots.pack", TextureAtlas.class);
+        assets.finishLoading();
+        atlas = assets.get("dots.pack");
+
         this.dd = dd;
         rand = new Random();
         sr = new ShapeRenderer();
         x = rand.nextInt(920) - 70;
         setHighestN();
-        gameDots = new ArrayList<com.kevinli.dotdropgame.sprites.GameDot>();
+        gameDots = new ArrayList<GameDot>();
         int random = generateRandom();
-        gameDots.add(new com.kevinli.dotdropgame.sprites.GameDot(x, com.kevinli.dotdropgame.DotDrop.HEIGHT, 0, random));
+        gameDots.add(new GameDot(x, DotDrop.HEIGHT, 0, random));
         passby++;
-        lineBounds = new Rectangle(0, 200, com.kevinli.dotdropgame.DotDrop.WIDTH, 4);
+        lineBounds = new Rectangle(0, 200, DotDrop.WIDTH, 4);
         a = 1;
         n = generateRandom();
         scoreStr = Integer.toString(score);
@@ -139,7 +151,7 @@ public class Game extends State {
             line = new Texture("antimatterline.png");
             minidot = new Texture("miniantimatter.png");
         }
-        cam.setToOrtho(false, com.kevinli.dotdropgame.DotDrop.WIDTH, com.kevinli.dotdropgame.DotDrop.HEIGHT);
+        cam.setToOrtho(false, DotDrop.WIDTH, DotDrop.HEIGHT);
         font = new BitmapFont(Gdx.files.internal("muli.fnt"));
         font.setColor(1, 1, 1, 0.2f);
         gl = new GlyphLayout();
@@ -163,7 +175,7 @@ public class Game extends State {
     @Override
     protected void handleInput() {
         if(Gdx.input.justTouched()) {
-            for (com.kevinli.dotdropgame.sprites.GameDot dots : gameDots) {
+            for (GameDot dots : gameDots) {
                 if (dots.getBounds().overlaps(lineBounds) && dots.getn() == n && !dots.getTouched()) {
                     if (pref.getInteger("volume") == 1) {
                         hit.play();
@@ -194,11 +206,11 @@ public class Game extends State {
         if (a > 0) {
             fade(true);
         } else {
-            for (com.kevinli.dotdropgame.sprites.GameDot dots : gameDots) {
+            for (GameDot dots : gameDots) {
                 dots.update(dt);
             }
 
-            if (gameDots.get(0).getPosition().y < -350 && gameDots.get(0).getn() == n &&
+            if (gameDots.get(0).getPosition().y < -300 && gameDots.get(0).getn() == n &&
                     !gameDots.get(0).getCleared()) {                                                // Change this to affect now low a dot must be below the screen to reset the game (-300)
                 pref.putInteger("currentHighscore", score);
                 pref.flush();
@@ -209,14 +221,14 @@ public class Game extends State {
                 gsm.set(new HighScore(gsm, dd));
             }
 
-            if (com.kevinli.dotdropgame.DotDrop.HEIGHT - gameDots.get(gameDots.size() - 1).getPosition().y >= distanceY) {
+            if (DotDrop.HEIGHT - gameDots.get(gameDots.size() - 1).getPosition().y >= distanceY) {
                 distanceY = rand.nextInt(Y_SPACING_MAX - Y_SPACING_MIN + 1) + Y_SPACING_MIN;
                 x = rand.nextInt(920) - 70;
                 if (passby == 5) {                                                                  // Change this to affect number of dots that pass by before same color appears
-                    gameDots.add(new com.kevinli.dotdropgame.sprites.GameDot(x, com.kevinli.dotdropgame.DotDrop.HEIGHT, n, 0));
+                    gameDots.add(new GameDot(x, DotDrop.HEIGHT, n, 0));
                 } else {
                     int random = generateRandom();
-                    gameDots.add(new com.kevinli.dotdropgame.sprites.GameDot(x, com.kevinli.dotdropgame.DotDrop.HEIGHT, 0, random));
+                    gameDots.add(new GameDot(x, DotDrop.HEIGHT, 0, random));
                 }
                 if (n == gameDots.get(gameDots.size() - 1).getn()) {
                     passby = 0;
@@ -225,7 +237,7 @@ public class Game extends State {
                 }
             }
 
-            if (gameDots.get(0).getPosition().y < -350) {
+            if (gameDots.get(0).getPosition().y < -300) {
                 gameDots.remove(0);
             }
         }
@@ -237,10 +249,10 @@ public class Game extends State {
         Gdx.gl.glClearColor(21/255f, 21/255f, 21/255f, 1);
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
-        font.draw(sb, scoreStr, com.kevinli.dotdropgame.DotDrop.WIDTH / 2 - fontWidth / 2,
-                com.kevinli.dotdropgame.DotDrop.HEIGHT / 2 + fontHeight / 2);
-        for (com.kevinli.dotdropgame.sprites.GameDot dots : gameDots) {
-            sb.draw(dots.getTexture(), dots.getPosition().x, dots.getPosition().y);
+        font.draw(sb, scoreStr, DotDrop.WIDTH / 2 - fontWidth / 2,
+                DotDrop.HEIGHT / 2 + fontHeight / 2);
+        for (GameDot dots : gameDots) {
+            sb.draw(atlas.findRegion(getDotNames()[dots.getn() - 1]), dots.getPosition().x, dots.getPosition().y);
         }
         sb.draw(line, 0, 200);
         sb.draw(minidot, 25, 1830, 65, 65);                                                         // Change y-coordinate to match viewport height (1835)
@@ -265,9 +277,6 @@ public class Game extends State {
 
     @Override
     public void dispose() {
-        for (com.kevinli.dotdropgame.sprites.GameDot dots : gameDots) {
-            dots.dispose();
-        }
         hit.dispose();
         font.dispose();
         line.dispose();

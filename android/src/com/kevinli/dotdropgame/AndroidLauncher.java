@@ -1,12 +1,16 @@
 package com.kevinli.dotdropgame;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -32,6 +36,7 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 
 	private GameHelper gameHelper;
 	private final static int requestCode = 1;
+	private final static int WRITE_STORAGE = 2;
 	private InterstitialAd interstitialAd;
 
 	@Override
@@ -90,30 +95,36 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 
 	@Override
 	public void shareIntent() {
-		byte[] pixels = ScreenUtils.getFrameBufferPixels(0, 0, Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), true);
+		int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_STORAGE);
+		} else {
+			byte[] pixels = ScreenUtils.getFrameBufferPixels(0, 0, Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), true);
 
-		try {
-			Pixmap pixmap = new Pixmap(Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), Pixmap.Format.RGBA8888);
-			BufferUtils.copy(pixels, 0, pixmap.getPixels(), pixels.length);
-			PixmapIO.writePNG(Gdx.files.external("Android/data/com.kevinli.dotdropgame/screenshots/screenshot.png"), pixmap);
-			pixmap.dispose();
-		} catch (Exception e) {}
+			try {
+				Pixmap pixmap = new Pixmap(Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), Pixmap.Format.RGBA8888);
+				BufferUtils.copy(pixels, 0, pixmap.getPixels(), pixels.length);
+				PixmapIO.writePNG(Gdx.files.external("Android/data/com.kevinli.dotdropgame/screenshots/screenshot.png"), pixmap);
+				pixmap.dispose();
+			} catch (Exception e) {
+			}
 
-		String path = new FileHandle(Gdx.files.getExternalStoragePath() + "Android/data/com.kevinli.dotdropgame/screenshots/screenshot.png").toString();
-		File file = new File(path);
+			String path = new FileHandle(Gdx.files.getExternalStoragePath() + "Android/data/com.kevinli.dotdropgame/screenshots/screenshot.png").toString();
+			File file = new File(path);
 
-		String message = "Check out my score in Dot Drop! Think you can beat me? Download the game here: https://play.google.com/store/apps/details?id=com.kevinli.dotdropgame";
-		Uri screenshotUri = Uri.fromFile(file);
-		Intent shareIntent = new Intent();
-		shareIntent.setAction(Intent.ACTION_SEND);
-		shareIntent.setType("image/*");
+			String message = "Check out my score in Dot Drop! Think you can beat me? Download the game here: https://play.google.com/store/apps/details?id=com.kevinli.dotdropgame";
+			Uri screenshotUri = Uri.fromFile(file);
+			Intent shareIntent = new Intent();
+			shareIntent.setAction(Intent.ACTION_SEND);
+			shareIntent.setType("image/*");
 
-		shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Dot Drop");
-		shareIntent.putExtra(Intent.EXTRA_TEXT, message);
-		shareIntent.putExtra(Intent.EXTRA_STREAM, screenshotUri);
-		shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Dot Drop");
+			shareIntent.putExtra(Intent.EXTRA_TEXT, message);
+			shareIntent.putExtra(Intent.EXTRA_STREAM, screenshotUri);
+			shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-		startActivity(Intent.createChooser(shareIntent, "Share screenshot to:"));
+			startActivity(Intent.createChooser(shareIntent, "Share screenshot to:"));
+		}
 	}
 
 	@Override

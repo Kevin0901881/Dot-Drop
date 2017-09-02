@@ -3,7 +3,6 @@ package com.kevinli.dotdropgame.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -12,6 +11,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.kevinli.dotdropgame.DotDrop;
+import com.kevinli.dotdropgame.sprites.StartDot;
+
 
 /**
  * Created by Kevin on 7/11/2017.
@@ -19,16 +20,16 @@ import com.kevinli.dotdropgame.DotDrop;
 
 public class Start extends State implements InputProcessor{
 
-    private com.kevinli.dotdropgame.sprites.StartDot dot;
+    private DotDrop dd;
+    private ShapeRenderer sr;
+    // Stores the touch coordinates so that it can be converted then used for the local screen resolution
+    private Vector3 touch;
+    private StartDot dot;
     private Unlocks unlocks;
 
-    private Texture wordmark;
-    private Texture text2;
-    private Texture downarrow;
-
-    private Sprite wordmarks;
-    private Sprite text2s;
-    private Sprite downarrows;
+    private Sprite wordmark;
+    private Sprite star;
+    private Sprite downarrow;
 
     // Start dot
     private Vector2 firstTouch;
@@ -39,33 +40,44 @@ public class Start extends State implements InputProcessor{
     // stored so that ball position can be set when dragged
     private Vector2 touchDownDelta;
 
-    private boolean tDown;
-    private boolean tDownU;
-    private boolean tDownU2;
+    // True if touched down within bounds of the start dot
+    private boolean tDownStartDot;
+    // True if touched down within the bounds of the unlocks dot, when unlocks is in a closed state
+    private boolean tDownUnlocksOpen;
+    // True if touched down within the up arrow in unlocks, when unlocks in in an opened state
+    private boolean tDownUnlocksClose;
+    // True if touched down within the dots in unlocks
     private boolean[] tDownDots;
+    // If openUnlock = 0 or 2, then unlocks is closed. If openUnlock = 1, then unlocks is opened
     private int openUnlock;
+    // Stores the dot being selected or unselected
     private int dotSelect;
 
-    private float y;
+    // Stores the alpha of the black rectangle (fade transition)
     private float a;
+    // True if the fade in transition has already occurred
     private boolean fadeIn;
-
-    ShapeRenderer sr;
-
-    private Preferences pref;
-    private DotDrop dd;
-
-    private Vector3 touch;
 
     public Start(GameStateManager gsm, DotDrop dd) {
         super(gsm);
-        pref = Gdx.app.getPreferences("com.kevin.dotdropgame.settings");
+        // Enables the use of the ActionResolver and PlayServices interfaces
         this.dd = dd;
         sr = new ShapeRenderer();
-        dot = new com.kevinli.dotdropgame.sprites.StartDot(DotDrop.WIDTH / 2 - 325, DotDrop.HEIGHT / 2 - 325);                      // Change radius of image (not bounds) (400)
-        y = 1850;
-        a = 1;
-        unlocks = new Unlocks((float) 100.5, y);
+        touch = new Vector3();
+        // Radius of start dot is 325
+        dot = new StartDot(DotDrop.WIDTH / 2 - 325, DotDrop.HEIGHT / 2 - 325);
+        unlocks = new Unlocks((float) 100.5, 1850);
+
+        wordmark = new Sprite(new Texture("wordmark.png"));
+        star = new Sprite(new Texture("text2.png"));
+        downarrow = new Sprite(new Texture("downarrow.png"));
+        wordmark.setPosition(15, 15);
+        star.setPosition(265, 1675);
+        downarrow.setPosition(DotDrop.WIDTH / 2 - downarrow.getWidth() / 2, DotDrop.HEIGHT / 4);
+        wordmark.setAlpha(0.1f);
+        star.setAlpha(0.4f);
+        downarrow.setAlpha(0.4f);
+
         firstTouch = new Vector2(0, 0);
         original = new Vector2(0, 0);
         delta = new Vector2(0, 0);
@@ -74,28 +86,18 @@ public class Start extends State implements InputProcessor{
             velocity[i] = new Vector2(0, 0);
         }
         touchDownDelta = new Vector2(0, 0);
+
         tDownDots = new boolean[15];
-        wordmark = new Texture("wordmark.png");
-        text2 = new Texture("text2.png");
-        downarrow = new Texture("downarrow.png");
-        wordmarks = new Sprite(wordmark);
-        text2s = new Sprite(text2);
-        downarrows = new Sprite(downarrow);
-        wordmarks.setPosition(15, 15);
-        text2s.setPosition(265, 1675);
-        downarrows.setPosition(DotDrop.WIDTH / 2 - downarrow.getWidth() / 2, DotDrop.HEIGHT / 4);
-        wordmarks.setAlpha(0.1f);
-        text2s.setAlpha(0.4f);
-        downarrows.setAlpha(0.4f);
+
+        // Alpha is 1 because the fade transition starts as all black
+        a = 1;
+
         cam.setToOrtho(false, DotDrop.WIDTH, DotDrop.HEIGHT);
         Gdx.input.setInputProcessor(this);
-        touch = new Vector3();
     }
 
     @Override
-    protected void handleInput() {
-
-    }
+    protected void handleInput() {}
 
     @Override
     public void update(float dt) {
@@ -107,6 +109,7 @@ public class Start extends State implements InputProcessor{
                 fadeIn = true;
             }
         }
+
         if (openUnlock == 1) {
             unlocks.open(dt);
             unlocks.fadeIn();
@@ -119,29 +122,24 @@ public class Start extends State implements InputProcessor{
             unlocks.fadeSelect(unlocks.getDotNames()[dotSelect], dotSelect);
         }
 
-        if ((dot.getPosition().x >= DotDrop.WIDTH) || (dot.getPosition().x + 650 <= 0)              // Change diameter of image (not bounds) (400)
-                || (dot.getPosition().y >= DotDrop.HEIGHT) || (dot.getPosition().y + 650 <= 0)) {   // Change diameter of image (not bounds) (400)
+        if ((dot.getPosition().x >= DotDrop.WIDTH) || (dot.getPosition().x + 650 <= 0)
+                || (dot.getPosition().y >= DotDrop.HEIGHT) || (dot.getPosition().y + 650 <= 0)) {
             fade(false);
             if (a >= 1) {
                 gsm.set(new Game(gsm, dd));
             }
         }
-
-//        if (unlocks.getPosition().get(1).y >= 125) {
-//            y -= 50;
-//            unlocks.setPosition(y);
-//        }
     }
 
     @Override
-    public void render(SpriteBatch sb) {
+        public void render(SpriteBatch sb) {
         Gdx.gl.glClearColor(21/255f, 21/255f, 21/255f, 1);
         sb.setProjectionMatrix(cam.combined);
         sb.enableBlending();
         sb.begin();
-        wordmarks.draw(sb);
-        text2s.draw(sb);
-        downarrows.draw(sb);
+        wordmark.draw(sb);
+        star.draw(sb);
+        downarrow.draw(sb);
         sb.draw(dot.getTexture(), dot.getPosition().x, dot.getPosition().y);
         unlocks.getBg2S().draw(sb);
 //        sb.draw(unlocks.getSprite()[1], unlocks.getPosition().get(1).x, unlocks.getPosition().get(1).y);
@@ -176,12 +174,9 @@ public class Start extends State implements InputProcessor{
 
     @Override
     public void dispose() {
-        wordmarks.getTexture().dispose();
-        wordmark.dispose();
-        text2s.getTexture().dispose();
-        text2.dispose();
-        downarrows.getTexture().dispose();
-        downarrow.dispose();
+        wordmark.getTexture().dispose();
+        star.getTexture().dispose();
+        downarrow.getTexture().dispose();
         unlocks.dispose();
         sr.dispose();
         dot.dispose();
@@ -210,7 +205,7 @@ public class Start extends State implements InputProcessor{
         touch.set(screenX, screenY, 0);
         cam.unproject(touch);
         if (dot.getBounds().contains(touch.x, touch.y) && openUnlock != 1) {
-            tDown = true;
+            tDownStartDot = true;
             firstTouch.set(touch.x, touch.y);
             original.set(touch.x, touch.y);
             touchDownDelta.set(touch.x - dot.getPosition().x,
@@ -218,9 +213,9 @@ public class Start extends State implements InputProcessor{
         }
 
         if (unlocks.getBounds().get(1).contains(touch.x, touch.y) && openUnlock != 1) {
-            tDownU = true;
+            tDownUnlocksOpen = true;
         } else if (unlocks.getBackBounds().contains(touch.x, touch.y)) {
-            tDownU2 = true;
+            tDownUnlocksClose = true;
         }
 
         if (openUnlock == 1) {
@@ -234,7 +229,7 @@ public class Start extends State implements InputProcessor{
 //
 //        if (unlocks.getBounds().get(1).contains(screenX, DotDrop.HEIGHT - screenY)) {
 //            System.out.println(screenX + "    " + screenY);
-//            tDownU = true;
+//            tDownUnlocksOpen = true;
 //            firstTouchU = screenY;
 //            originalU = screenY;
 //            touchDownDeltaU = DotDrop.HEIGHT - screenY - dot.getPosition().y;
@@ -247,47 +242,35 @@ public class Start extends State implements InputProcessor{
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         touch.set(screenX, screenY, 0);
         cam.unproject(touch);
-        if (tDown) {
+        if (tDownStartDot) {
             Vector2 total = new Vector2();
-            tDown = false;
-            dot.setTDown(tDown);
+            tDownStartDot = false;
+            dot.setTDown(tDownStartDot);
             for (int i = 0; i < 10; i++) {
                 total.add(velocity[i]);
             }
             total.scl((float) 1/10);
-            System.out.println("x: " + delta.x + " y: " + delta.y);
-            System.out.println("x: " + velocity[1].x + " y: " + velocity[1].y);
-            System.out.println("x: " + velocity[2].x + " y: " + velocity[2].y);
-            System.out.println("x: " + velocity[3].x + " y: " + velocity[3].y);
-            System.out.println("x: " + velocity[4].x + " y: " + velocity[4].y);
-            System.out.println("x: " + velocity[5].x + " y: " + velocity[5].y);
-            System.out.println("x: " + velocity[6].x + " y: " + velocity[6].y);
-            System.out.println("x: " + velocity[7].x + " y: " + velocity[7].y);
-            System.out.println("x: " + velocity[8].x + " y: " + velocity[8].y);
-            System.out.println("x: " + velocity[8].x + " y: " + velocity[8].y);
-            System.out.println("x: " + velocity[9].x + " y: " + velocity[9].y);
-            System.out.println("total.x: " + total.x + " total.y: " + total.y);
             dot.dotFling(total.x, total.y);
         }
-        tDown = false;
+        tDownStartDot = false;
 
-        if (tDownU && unlocks.getBounds().get(1).contains(touch.x, touch.y)) {
+        if (tDownUnlocksOpen && unlocks.getBounds().get(1).contains(touch.x, touch.y)) {
 //            if (openUnlock == 0 || openUnlock == 2) {
 //                openUnlock = 1;
 //            } else {
 //                openUnlock = 2;
 //            }
             openUnlock = 1;
-            tDownU = false;
+            tDownUnlocksOpen = false;
         } else {
-            tDownU = false;
+            tDownUnlocksOpen = false;
         }
 
-        if (tDownU2 && unlocks.getBackBounds().contains(touch.x, touch.y)) {
+        if (tDownUnlocksClose && unlocks.getBackBounds().contains(touch.x, touch.y)) {
             openUnlock = 2;
-            tDownU2 = false;
+            tDownUnlocksClose = false;
         } else {
-            tDownU2 = false;
+            tDownUnlocksClose = false;
         }
 
         if (openUnlock == 1 && tDownDots[dotSelect] && unlocks.getBounds().get(dotSelect).contains(touch.x, touch.y)) {
@@ -303,8 +286,8 @@ public class Start extends State implements InputProcessor{
         touch.set(screenX, screenY, 0);
         cam.unproject(touch);
         float dt = Gdx.graphics.getDeltaTime();
-        if (tDown) {
-            dot.setTDown(tDown);
+        if (tDownStartDot) {
+            dot.setTDown(tDownStartDot);
             dot.setTDragged(true);
             Vector2 currentTouch = new Vector2(touch.x, touch.y);
             delta.set(currentTouch.cpy().sub(firstTouch));
@@ -345,7 +328,7 @@ public class Start extends State implements InputProcessor{
                     touch.y - touchDownDelta.y);
         }
 
-//        if (tDownU) {
+//        if (tDownUnlocksOpen) {
 //            float currentTouchU = screenY;
 //            deltaU = currentTouchU - firstTouchU;
 //            firstTouchU = currentTouchU;

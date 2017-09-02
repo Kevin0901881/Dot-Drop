@@ -256,7 +256,6 @@ public class HighScore extends State implements InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         touch.set(screenX, screenY, 0);
         cam.unproject(touch);
-        System.out.println("X: " + touch.x + " Y: " + touch.y);
         if (startBound.contains(touch.x, touch.y) && touchStart == 0) {
             touchStart = 1;
             aStart = 0.5f;

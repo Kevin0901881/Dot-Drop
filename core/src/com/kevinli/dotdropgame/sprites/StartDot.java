@@ -1,10 +1,8 @@
 package com.kevinli.dotdropgame.sprites;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
-import com.kevinli.dotdropgame.DotDrop;
 
 /**
  * Created by Kevin on 7/11/2017.
@@ -12,7 +10,6 @@ import com.kevinli.dotdropgame.DotDrop;
 
 public class StartDot {
     private static final int GRAVITY = -110;
-    private static final float FACTOR = (float) Gdx.graphics.getWidth() / DotDrop.WIDTH;
     private Vector2 position;
     private Vector2 velocity;
     private Texture dot;
@@ -21,7 +18,7 @@ public class StartDot {
     // meaning gravity is applied when ball is not touched.
     private boolean tDragged;
     // If touched down, gravity won't be applied
-    private boolean tDown;
+    private boolean tDownStartDot;
     private float x;
 
     public StartDot(float x, float y) {
@@ -34,7 +31,7 @@ public class StartDot {
     }
 
     public void update(float dt) {
-        if (!tDown && tDragged) {
+        if (!tDownStartDot && tDragged) {
             velocity.add(0, GRAVITY);
         }
         velocity.scl(dt);
@@ -80,8 +77,8 @@ public class StartDot {
         this.tDragged = tDragged;
     }
 
-    public void setTDown(boolean tDown) {
-        this.tDown = tDown;
+    public void setTDown(boolean tDownStartDot) {
+        this.tDownStartDot = tDownStartDot;
     }
 
     public void dispose() {

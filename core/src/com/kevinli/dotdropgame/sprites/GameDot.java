@@ -1,6 +1,5 @@
 package com.kevinli.dotdropgame.sprites;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -29,7 +28,6 @@ public class GameDot {
     private static final int GRAVITY = -25;                                                         // Change gravity value
     private Vector2 position;
     private Vector2 velocity;
-    private Texture dot;
     private Rectangle bounds;
     private int n;
     private boolean cleared = false;
@@ -43,7 +41,6 @@ public class GameDot {
         }
         position = new Vector2(x, y);
         velocity = new Vector2(0, 0);
-        dot = new Texture(getDotNames()[n - 1] + ".png");
         bounds = new Rectangle(x + 78, y + 72, 156, 156);                                           // Change radius of image (not bounds) (100)
                                                                                                     //      Change radius of bounds (50)
     }
@@ -67,10 +64,6 @@ public class GameDot {
         return position;
     }
 
-    public Texture getTexture() {
-        return dot;
-    }
-
     public Rectangle getBounds() {
         return bounds;
     }
@@ -89,29 +82,5 @@ public class GameDot {
 
     public void setCleared(boolean clear) {
         cleared = clear;
-    }
-
-    public void dispose() {
-        dot.dispose();
-    }
-
-    private String[] getDotNames() {
-        String[] dotNames = new String[15];
-        dotNames[0] = "lime";
-        dotNames[1] = "aquamarine";
-        dotNames[2] = "fire";
-        dotNames[3] = "royal";
-        dotNames[4] = "flamingo";
-        dotNames[5] = "hotrod";
-        dotNames[6] = "lilac";
-        dotNames[7] = "lemon";
-        dotNames[8] = "snow";
-        dotNames[9] = "emerald";
-        dotNames[10] = "chestnut";
-        dotNames[11] = "shark";
-        dotNames[12] = "midnight";
-        dotNames[13] = "danube";
-        dotNames[14] = "antimatter";
-        return dotNames;
     }
 }

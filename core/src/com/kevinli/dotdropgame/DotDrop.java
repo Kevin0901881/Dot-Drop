@@ -5,13 +5,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.kevinli.dotdropgame.states.GameStateManager;
+import com.kevinli.dotdropgame.states.Start;
 
 public class DotDrop extends ApplicationAdapter {
 	public static final int WIDTH = 1080;
 	public static final int HEIGHT = 1920;
 
 	public static final String TITLE = "Dot Drop";
-	private com.kevinli.dotdropgame.states.GameStateManager gsm;
+	private GameStateManager gsm;
 	private SpriteBatch batch;
 
 	public ActionResolver ar;
@@ -34,12 +36,12 @@ public class DotDrop extends ApplicationAdapter {
 		pref.putInteger("adCounter", 0);
 		pref.flush();
 		batch = new SpriteBatch();
-		gsm = new com.kevinli.dotdropgame.states.GameStateManager();
+		gsm = new GameStateManager();
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		if (playServices.isSignedIn()) {
 			playServices.signIn();
 		}
-		gsm.push(new com.kevinli.dotdropgame.states.Start(gsm, this)); // change this to push home screen
+		gsm.push(new Start(gsm, this));
 		Gdx.input.setCatchBackKey(true);
 	}
 
