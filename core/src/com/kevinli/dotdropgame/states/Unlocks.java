@@ -2,11 +2,13 @@ package com.kevinli.dotdropgame.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -25,43 +27,28 @@ import com.kevinli.dotdropgame.DotDrop;
 public class Unlocks {
     private static final int UP_ACCEL = 700;
 
-    private Texture lime;
-    private Texture aquamarine;
-    private Texture fire;
-    private Texture royal;
-    private Texture flamingo;
-    private Texture hotrod;
-    private Texture lilac;
-    private Texture lemon;
-    private Texture snow;
-    private Texture emerald;
-    private Texture chestnut;
-    private Texture shark;
-    private Texture midnight;
-    private Texture danube;
-    private Texture antimatter;
-    private Texture bg2;
-    private Texture back;
-
-    private Sprite limes;
-    private Sprite aquamarines;
-    private Sprite fires;
-    private Sprite royals;
-    private Sprite flamingos;
-    private Sprite hotrods;
-    private Sprite lilacs;
-    private Sprite lemons;
-    private Sprite snows;
-    private Sprite emeralds;
-    private Sprite chestnuts;
-    private Sprite sharks;
-    private Sprite midnights;
-    private Sprite danubes;
-    private Sprite antimatters;
-    private Sprite bg2S;
-    private Sprite backS;
+    private AssetManager assets;
+    private TextureAtlas atlas;
 
     private Preferences pref;
+
+    private Sprite lime;
+    private Sprite aquamarine;
+    private Sprite fire;
+    private Sprite royal;
+    private Sprite flamingo;
+    private Sprite hotrod;
+    private Sprite lilac;
+    private Sprite lemon;
+    private Sprite snow;
+    private Sprite emerald;
+    private Sprite chestnut;
+    private Sprite shark;
+    private Sprite midnight;
+    private Sprite danube;
+    private Sprite antimatter;
+    private Sprite bg2;
+    private Sprite back;
 
     private Sprite[] dots;
     private Array<Vector3> position;
@@ -153,6 +140,11 @@ public class Unlocks {
     private String warningTxt;
 
     public Unlocks(float x, float y) {
+        assets = new AssetManager();
+        assets.load("udots.pack", TextureAtlas.class);
+        assets.finishLoading();
+        atlas = assets.get("udots.pack");
+
         pref = Gdx.app.getPreferences("com.kevin.dotdropgame.settings");
         if (!pref.contains("selected")) {
             pref.putInteger("selected", 0);
@@ -174,7 +166,6 @@ public class Unlocks {
         font2.setColor(1, 1, 1, 0);
         fontWarning.setColor(1, 1, 1, 1);
         prefCheck();
-        setTexture();
         setSprite();
         setSpriteAlpha();
         setText();
@@ -184,33 +175,7 @@ public class Unlocks {
     }
 
     public void open(float dt) {
-//        if (position.get(1).y >= -22) {//873.5
-//            velocity += DOWN_ACCEL;
-////        } else if (position.get(1).y >= -22.5){
-////            velocity += UP_ACCEL;
-////        } else {
-//        } else {
-//            velocity = 0;
-//        }
-//        velocity *= dt;
-//        if (position.get(1).y >= -22) {
-//            velocity = (float) -126.75;
-//        } else {
-//            velocity = 0;
-//        }
-//        for (int i = 0; i < 15; i++) {
-//            position.get(i).y += velocity;
-//        }
-//        velocity /= dt;
-
         if (position.get(1).y > 876.25) {
-//            velocity += DOWN_ACCEL;
-//            velocity *= dt;
-//            for (int i = 0; i < 15; i++) {
-//                position.get(i).y += velocity;
-//            }
-//            velocity /= dt;
-//            y = position.get(1).y + (float) 122.5;
             y -= (910 - (position.get(1).y - 876.25)) / 5;
             positionY(y);
         } else if (position.get(2).y > 15) {
@@ -221,26 +186,11 @@ public class Unlocks {
         for (int i = 0; i < 15; i++) {
             bounds.get(i).setPosition(position.get(i).x + dots[i].getWidth() / 2, position.get(i).y + dots[i].getHeight() / 2);
         }
-        backBounds.setPosition(DotDrop.WIDTH / 2 - 150, backS.getY() - 25);
+        backBounds.setPosition(DotDrop.WIDTH / 2 - 150, back.getY() - 25);
         bg2sFadeIn();
     }
 
     public void close(float dt) {
-//        if (position.get(1).y <= 650) {//1225
-//            velocity += UP_ACCEL_2;
-//        } else if (position.get(1).y <= 1875){
-//            velocity += DOWN_ACCEL_2;
-//            if (velocity <= 0) {
-//                velocity = 0;
-//            }
-//        } else {
-//            velocity = 0;
-//        }
-//        velocity *= dt;
-//        for (int i = 0; i < 15; i++) {
-//            position.get(i).y += velocity;
-//        }
-//        velocity /= dt;
         if (position.get(1).y < 876.25) {
             velocity += UP_ACCEL;
             velocity *= dt;
@@ -261,7 +211,7 @@ public class Unlocks {
         for (int i = 0; i < 15; i++) {
             bounds.get(i).setPosition(position.get(i).x + dots[i].getWidth() / 2, position.get(i).y + dots[i].getHeight() / 2);
         }
-        backBounds.setPosition(DotDrop.WIDTH / 2 - 150, backS.getY() - 25);
+        backBounds.setPosition(DotDrop.WIDTH / 2 - 150, back.getY() - 25);
         bg2sFadeOut();
     }
 
@@ -324,135 +274,108 @@ public class Unlocks {
         pref.flush();
     }
 
-    public void setTexture() {
-        lime = new Texture("ulime.png");
-        aquamarine = new Texture("uaquamarine.png");
-        fire = new Texture("ufire.png");
-        royal = new Texture("uroyal.png");
-        flamingo = new Texture("uflamingo.png");
+    public void setSprite() {
+        lime = new Sprite(atlas.findRegion("ulime"));
+        dots[0] = lime;
+        aquamarine = new Sprite(atlas.findRegion("uaquamarine"));
+        dots[1] = aquamarine;
+        fire =  new Sprite(atlas.findRegion("ufire"));
+        dots[2] = fire;
+        royal = new Sprite(atlas.findRegion("uroyal"));
+        dots[3] = royal;
+        flamingo = new Sprite(atlas.findRegion("uflamingo"));
+        dots[4] = flamingo;
 
         if (pref.getInteger("hotrod") == 1) {
-            hotrod = new Texture("dotlocked.png");
+            hotrod = new Sprite(new Texture("dotlocked.png"));
         } else {
-            hotrod = new Texture("uhotrod.png");
+            hotrod = new Sprite(atlas.findRegion("uhotrod"));
         }
+        dots[5] = hotrod;
 
         if (pref.getInteger("lilac") == 1) {
-            lilac = new Texture("dotlocked.png");
+            lilac = new Sprite(new Texture("dotlocked.png"));
         } else {
-            lilac = new Texture("ulilac.png");
+            lilac = new Sprite(atlas.findRegion("ulilac"));
         }
+        dots[6] = lilac;
 
         if (pref.getInteger("lemon") == 1) {
-            lemon = new Texture("dotlocked.png");
+            lemon = new Sprite(new Texture("dotlocked.png"));
         } else {
-            lemon = new Texture("ulemon.png");
+            lemon = new Sprite(atlas.findRegion("ulemon"));
         }
+        dots[7] = lemon;
 
         if (pref.getInteger("snow") == 1) {
-            snow = new Texture("dotlocked.png");
+            snow = new Sprite(new Texture("dotlocked.png"));
         } else {
-            snow = new Texture("usnow.png");
+            snow = new Sprite(atlas.findRegion("usnow"));
         }
+        dots[8] = snow;
 
         if (pref.getInteger("emerald") == 1) {
-            emerald = new Texture("dotlocked.png");
+            emerald = new Sprite(new Texture("dotlocked.png"));
         } else {
-            emerald = new Texture("uemerald.png");
+            emerald = new Sprite(atlas.findRegion("uemerald"));
         }
+        dots[9] = emerald;
 
         if (pref.getInteger("chestnut") == 1) {
-            chestnut = new Texture("dotlocked.png");
+            chestnut = new Sprite(new Texture("dotlocked.png"));
         } else {
-            chestnut = new Texture("uchestnut.png");
+            chestnut = new Sprite(atlas.findRegion("uchestnut"));
         }
+        dots[10] = chestnut;
 
         if (pref.getInteger("shark") == 1) {
-            shark = new Texture("dotlocked.png");
+            shark = new Sprite(new Texture("dotlocked.png"));
         } else {
-            shark = new Texture("ushark.png");
+            shark = new Sprite(atlas.findRegion("ushark"));
         }
+        dots[11] = shark;
 
         if (pref.getInteger("midnight") == 1) {
-            midnight = new Texture("dotlocked.png");
+            midnight = new Sprite(new Texture("dotlocked.png"));
         } else {
-            midnight = new Texture("umidnight.png");
+            midnight = new Sprite(atlas.findRegion("umidnight"));
         }
+        dots[12] = midnight;
 
         if (pref.getInteger("danube") == 1) {
-            danube = new Texture("dotlocked.png");
+            danube = new Sprite(new Texture("dotlocked.png"));
         } else {
-            danube = new Texture("udanube.png");
+            danube = new Sprite(atlas.findRegion("udanube"));
         }
+        dots[13] = danube;
 
         if (pref.getInteger("antimatter") == 1) {
-            antimatter = new Texture("dotlocked.png");
+            antimatter = new Sprite(new Texture("dotlocked.png"));
         } else {
-            antimatter = new Texture("uantimatter.png");
+            antimatter = new Sprite(atlas.findRegion("uantimatter"));
         }
+        dots[14] = antimatter;
 
-        bg2 = new Texture("bg2.png");
-        back = new Texture("back.png");
-    }
-
-    public void setSprite() {
-        limes = new Sprite(lime);
-        dots[0] = limes;
-        aquamarines = new Sprite(aquamarine);
-        dots[1] = aquamarines;
-        fires =  new Sprite(fire);
-        dots[2] = fires;
-        royals = new Sprite(royal);
-        dots[3] = royals;
-        flamingos = new Sprite(flamingo);
-        dots[4] = flamingos;
-        hotrods = new Sprite(hotrod);
-        dots[5] = hotrods;
-        lilacs = new Sprite(lilac);
-        dots[6] = lilacs;
-        lemons = new Sprite(lemon);
-        dots[7] = lemons;
-        snows = new Sprite(snow);
-        dots[8] = snows;
-        emeralds = new Sprite(emerald);
-        dots[9] = emeralds;
-        chestnuts = new Sprite(chestnut);
-        dots[10] = chestnuts;
-        sharks = new Sprite(shark);
-        dots[11] = sharks;
-        midnights = new Sprite(midnight);
-        dots[12] = midnights;
-        danubes = new Sprite(danube);
-        dots[13] = danubes;
-        antimatters = new Sprite(antimatter);
-        dots[14] = antimatters;
-
-        bg2S = new Sprite(bg2);
-        backS = new Sprite(back);
-
-//        for (int i = 0; i < 15; i++) {
-//            if (i != 1) {
-//                dots[i].setColor(dots[i].getColor().r, dots[i].getColor().g, dots[i].getColor().b, 0);
-//            }
-//        }
+        bg2 = new Sprite(new Texture("bg2.png"));
+        back = new Sprite(new Texture("back.png"));
     }
 
     public void setSpriteAlpha() {
-        limes.setAlpha(0);
-        aquamarines.setAlpha(1);
-        fires.setAlpha(0);
-        royals.setAlpha(0);
-        flamingos.setAlpha(0);
-        hotrods.setAlpha(0);
-        lilacs.setAlpha(0);
-        lemons.setAlpha(0);
-        snows.setAlpha(0);
-        emeralds.setAlpha(0);
-        chestnuts.setAlpha(0);
-        sharks.setAlpha(0);
-        midnights.setAlpha(0);
-        danubes.setAlpha(0);
-        antimatters.setAlpha(0);
+        lime.setAlpha(0);
+        aquamarine.setAlpha(1);
+        fire.setAlpha(0);
+        royal.setAlpha(0);
+        flamingo.setAlpha(0);
+        hotrod.setAlpha(0);
+        lilac.setAlpha(0);
+        lemon.setAlpha(0);
+        snow.setAlpha(0);
+        emerald.setAlpha(0);
+        chestnut.setAlpha(0);
+        shark.setAlpha(0);
+        midnight.setAlpha(0);
+        danube.setAlpha(0);
+        antimatter.setAlpha(0);
 
         if (pref.getInteger("lime") == 1 || pref.getInteger("lime") == 3) {
             aDots[0] = 1;
@@ -544,8 +467,8 @@ public class Unlocks {
             aDots[14] = (float) 0.25;
         }
 
-        bg2S.setAlpha(0);
-        backS.setAlpha(0);
+        bg2.setAlpha(0);
+        back.setAlpha(0);
     }
 
     private void setText() {
@@ -754,7 +677,7 @@ public class Unlocks {
             position.add(new Vector3((float) 530.5 + x, (float) 1281.5 + y, 0));
         }
 
-        backS.setPosition(DotDrop.WIDTH / 2 - backS.getWidth() / 2, 1720 + y);
+        back.setPosition(DotDrop.WIDTH / 2 - back.getWidth() / 2, 1720 + y);
     }
 
     public void positionY(float y) {
@@ -824,7 +747,7 @@ public class Unlocks {
             position.get(14).set((float) 530.5 + x, (float) 1281.5 + y, 0);
         }
 
-        backS.setPosition(DotDrop.WIDTH / 2 - backS.getWidth() / 2, 1720 + y);
+        back.setPosition(DotDrop.WIDTH / 2 - back.getWidth() / 2, 1720 + y);
     }
 
     public void createBounds() {
@@ -868,12 +791,12 @@ public class Unlocks {
         return backBounds;
     }
 
-    public Sprite getBg2S() {
-        return bg2S;
+    public Sprite getBg2() {
+        return bg2;
     }
 
-    public Sprite getBackS() {
-        return backS;
+    public Sprite getBack() {
+        return back;
     }
 
     public String[] getDotNames() {
@@ -898,123 +821,123 @@ public class Unlocks {
 
     public void drawText(SpriteBatch sb) {
         if (pref.getInteger("lime") == 3) {
-            font.draw(sb, limetxt, limes.getX() + (limes.getWidth() / 2) - limeWidth / 2,
-                    limes.getY() + (limes.getHeight() / 2) - 113 - 20 - limeHeight / 2);
+            font.draw(sb, limetxt, lime.getX() + (lime.getWidth() / 2) - limeWidth / 2,
+                    lime.getY() + (lime.getHeight() / 2) - 113 - 20 - limeHeight / 2);
         } else {
-            font2.draw(sb, limetxt, limes.getX() + (limes.getWidth() / 2) - limeWidth / 2,
-                    limes.getY() + (limes.getHeight() / 2) - 113 - 20 - limeHeight / 2);
+            font2.draw(sb, limetxt, lime.getX() + (lime.getWidth() / 2) - limeWidth / 2,
+                    lime.getY() + (lime.getHeight() / 2) - 113 - 20 - limeHeight / 2);
         }
 
         if (pref.getInteger("aquamarine") == 3) {
-            font.draw(sb, aquamarinetxt, aquamarines.getX() + (aquamarines.getWidth() / 2) - aquamarineWidth / 2,
-                    aquamarines.getY() + (aquamarines.getHeight() / 2) - 113 - 20 - aquamarineHeight / 2);
+            font.draw(sb, aquamarinetxt, aquamarine.getX() + (aquamarine.getWidth() / 2) - aquamarineWidth / 2,
+                    aquamarine.getY() + (aquamarine.getHeight() / 2) - 113 - 20 - aquamarineHeight / 2);
         } else {
-            font2.draw(sb, aquamarinetxt, aquamarines.getX() + (aquamarines.getWidth() / 2) - aquamarineWidth / 2,
-                    aquamarines.getY() + (aquamarines.getHeight() / 2) - 113 - 20 - aquamarineHeight / 2);
+            font2.draw(sb, aquamarinetxt, aquamarine.getX() + (aquamarine.getWidth() / 2) - aquamarineWidth / 2,
+                    aquamarine.getY() + (aquamarine.getHeight() / 2) - 113 - 20 - aquamarineHeight / 2);
         }
 
         if (pref.getInteger("fire") == 3) {
-            font.draw(sb, firetxt, fires.getX() + (fires.getWidth() / 2) - fireWidth / 2,
-                    fires.getY() + (fires.getHeight() / 2) - 113 - 20 - fireHeight / 2);
+            font.draw(sb, firetxt, fire.getX() + (fire.getWidth() / 2) - fireWidth / 2,
+                    fire.getY() + (fire.getHeight() / 2) - 113 - 20 - fireHeight / 2);
         } else {
-            font2.draw(sb, firetxt, fires.getX() + (fires.getWidth() / 2) - fireWidth / 2,
-                    fires.getY() + (fires.getHeight() / 2) - 113 - 20 - fireHeight / 2);
+            font2.draw(sb, firetxt, fire.getX() + (fire.getWidth() / 2) - fireWidth / 2,
+                    fire.getY() + (fire.getHeight() / 2) - 113 - 20 - fireHeight / 2);
         }
 
         if (pref.getInteger("royal") == 3) {
-            font.draw(sb, royaltxt, royals.getX() + (royals.getWidth() / 2) - royalWidth / 2,
-                    royals.getY() + (royals.getHeight() / 2) - 113 - 20 - royalHeight / 2);
+            font.draw(sb, royaltxt, royal.getX() + (royal.getWidth() / 2) - royalWidth / 2,
+                    royal.getY() + (royal.getHeight() / 2) - 113 - 20 - royalHeight / 2);
         } else {
-            font2.draw(sb, royaltxt, royals.getX() + (royals.getWidth() / 2) - royalWidth / 2,
-                    royals.getY() + (royals.getHeight() / 2) - 113 - 20 - royalHeight / 2);
+            font2.draw(sb, royaltxt, royal.getX() + (royal.getWidth() / 2) - royalWidth / 2,
+                    royal.getY() + (royal.getHeight() / 2) - 113 - 20 - royalHeight / 2);
         }
 
         if (pref.getInteger("flamingo") == 3) {
-            font.draw(sb, flamingotxt, flamingos.getX() + (flamingos.getWidth() / 2) - flamingoWidth / 2,
-                    flamingos.getY() + (flamingos.getHeight() / 2) - 113 - 20 - flamingoHeight / 2);
+            font.draw(sb, flamingotxt, flamingo.getX() + (flamingo.getWidth() / 2) - flamingoWidth / 2,
+                    flamingo.getY() + (flamingo.getHeight() / 2) - 113 - 20 - flamingoHeight / 2);
         } else {
-            font2.draw(sb, flamingotxt, flamingos.getX() + (flamingos.getWidth() / 2) - flamingoWidth / 2,
-                    flamingos.getY() + (flamingos.getHeight() / 2) - 113 - 20 - flamingoHeight / 2);
+            font2.draw(sb, flamingotxt, flamingo.getX() + (flamingo.getWidth() / 2) - flamingoWidth / 2,
+                    flamingo.getY() + (flamingo.getHeight() / 2) - 113 - 20 - flamingoHeight / 2);
         }
 
         if (pref.getInteger("hotrod") == 1 || pref.getInteger("hotrod") == 2) {
-            font2.draw(sb, hotrodtxt, hotrods.getX() + (hotrods.getWidth() / 2) - hotrodWidth / 2,
-                    hotrods.getY() + (hotrods.getHeight() / 2) - 113 - 20 - hotrodHeight / 2);
+            font2.draw(sb, hotrodtxt, hotrod.getX() + (hotrod.getWidth() / 2) - hotrodWidth / 2,
+                    hotrod.getY() + (hotrod.getHeight() / 2) - 113 - 20 - hotrodHeight / 2);
         } else {
-            font.draw(sb, hotrodtxt, hotrods.getX() + (hotrods.getWidth() / 2) - hotrodWidth / 2,
-                    hotrods.getY() + (hotrods.getHeight() / 2) - 113 - 20 - hotrodHeight / 2);
+            font.draw(sb, hotrodtxt, hotrod.getX() + (hotrod.getWidth() / 2) - hotrodWidth / 2,
+                    hotrod.getY() + (hotrod.getHeight() / 2) - 113 - 20 - hotrodHeight / 2);
         }
 
         if (pref.getInteger("lilac") == 1 || pref.getInteger("lilac") == 2) {
-            font2.draw(sb, lilactxt, lilacs.getX() + (lilacs.getWidth() / 2) - lilacWidth / 2,
-                    lilacs.getY() + (lilacs.getHeight() / 2) - 113 - 20 - lilacHeight / 2);
+            font2.draw(sb, lilactxt, lilac.getX() + (lilac.getWidth() / 2) - lilacWidth / 2,
+                    lilac.getY() + (lilac.getHeight() / 2) - 113 - 20 - lilacHeight / 2);
         } else {
-            font.draw(sb, lilactxt, lilacs.getX() + (lilacs.getWidth() / 2) - lilacWidth / 2,
-                    lilacs.getY() + (lilacs.getHeight() / 2) - 113 - 20 - lilacHeight / 2);
+            font.draw(sb, lilactxt, lilac.getX() + (lilac.getWidth() / 2) - lilacWidth / 2,
+                    lilac.getY() + (lilac.getHeight() / 2) - 113 - 20 - lilacHeight / 2);
         }
 
         if (pref.getInteger("lemon") == 1 || pref.getInteger("lemon") == 2) {
-            font2.draw(sb, lemontxt, lemons.getX() + (lemons.getWidth() / 2) - lemonWidth / 2,
-                    lemons.getY() + (lemons.getHeight() / 2) - 113 - 20 - lemonHeight / 2);
+            font2.draw(sb, lemontxt, lemon.getX() + (lemon.getWidth() / 2) - lemonWidth / 2,
+                    lemon.getY() + (lemon.getHeight() / 2) - 113 - 20 - lemonHeight / 2);
         } else {
-            font.draw(sb, lemontxt, lemons.getX() + (lemons.getWidth() / 2) - lemonWidth / 2,
-                    lemons.getY() + (lemons.getHeight() / 2) - 113 - 20 - lemonHeight / 2);
+            font.draw(sb, lemontxt, lemon.getX() + (lemon.getWidth() / 2) - lemonWidth / 2,
+                    lemon.getY() + (lemon.getHeight() / 2) - 113 - 20 - lemonHeight / 2);
         }
 
         if (pref.getInteger("snow") == 1 || pref.getInteger("snow") == 2) {
-            font2.draw(sb, snowtxt, snows.getX() + (snows.getWidth() / 2) - snowWidth / 2,
-                    snows.getY() + (snows.getHeight() / 2) - 113 - 20 - snowHeight / 2);
+            font2.draw(sb, snowtxt, snow.getX() + (snow.getWidth() / 2) - snowWidth / 2,
+                    snow.getY() + (snow.getHeight() / 2) - 113 - 20 - snowHeight / 2);
         } else {
-            font.draw(sb, snowtxt, snows.getX() + (snows.getWidth() / 2) - snowWidth / 2,
-                    snows.getY() + (snows.getHeight() / 2) - 113 - 20 - snowHeight / 2);
+            font.draw(sb, snowtxt, snow.getX() + (snow.getWidth() / 2) - snowWidth / 2,
+                    snow.getY() + (snow.getHeight() / 2) - 113 - 20 - snowHeight / 2);
         }
 
         if (pref.getInteger("emerald") == 1 || pref.getInteger("emerald") == 2) {
-            font2.draw(sb, emeraldtxt, emeralds.getX() + (emeralds.getWidth() / 2) - emeraldWidth / 2,
-                    emeralds.getY() + (emeralds.getHeight() / 2) - 113 - 20 - emeraldHeight / 2);
+            font2.draw(sb, emeraldtxt, emerald.getX() + (emerald.getWidth() / 2) - emeraldWidth / 2,
+                    emerald.getY() + (emerald.getHeight() / 2) - 113 - 20 - emeraldHeight / 2);
         } else {
-            font.draw(sb, emeraldtxt, emeralds.getX() + (emeralds.getWidth() / 2) - emeraldWidth / 2,
-                    emeralds.getY() + (emeralds.getHeight() / 2) - 113 - 20 - emeraldHeight / 2);
+            font.draw(sb, emeraldtxt, emerald.getX() + (emerald.getWidth() / 2) - emeraldWidth / 2,
+                    emerald.getY() + (emerald.getHeight() / 2) - 113 - 20 - emeraldHeight / 2);
         }
 
         if (pref.getInteger("chestnut") == 1 || pref.getInteger("chestnut") == 2) {
-            font2.draw(sb, chestnuttxt, chestnuts.getX() + (chestnuts.getWidth() / 2) - chestnutWidth / 2,
-                    chestnuts.getY() + (chestnuts.getHeight() / 2) - 113 - 20 - chestnutHeight / 2);
+            font2.draw(sb, chestnuttxt, chestnut.getX() + (chestnut.getWidth() / 2) - chestnutWidth / 2,
+                    chestnut.getY() + (chestnut.getHeight() / 2) - 113 - 20 - chestnutHeight / 2);
         } else {
-            font.draw(sb, chestnuttxt, chestnuts.getX() + (chestnuts.getWidth() / 2) - chestnutWidth / 2,
-                    chestnuts.getY() + (chestnuts.getHeight() / 2) - 113 - 20 - chestnutHeight / 2);
+            font.draw(sb, chestnuttxt, chestnut.getX() + (chestnut.getWidth() / 2) - chestnutWidth / 2,
+                    chestnut.getY() + (chestnut.getHeight() / 2) - 113 - 20 - chestnutHeight / 2);
         }
 
         if (pref.getInteger("shark") == 1 || pref.getInteger("shark") == 2) {
-            font2.draw(sb, sharktxt, sharks.getX() + (sharks.getWidth() / 2) - sharkWidth / 2,
-                    sharks.getY() + (sharks.getHeight() / 2) - 113 - 20 - sharkHeight / 2);
+            font2.draw(sb, sharktxt, shark.getX() + (shark.getWidth() / 2) - sharkWidth / 2,
+                    shark.getY() + (shark.getHeight() / 2) - 113 - 20 - sharkHeight / 2);
         } else {
-            font.draw(sb, sharktxt, sharks.getX() + (sharks.getWidth() / 2) - sharkWidth / 2,
-                    sharks.getY() + (sharks.getHeight() / 2) - 113 - 20 - sharkHeight / 2);
+            font.draw(sb, sharktxt, shark.getX() + (shark.getWidth() / 2) - sharkWidth / 2,
+                    shark.getY() + (shark.getHeight() / 2) - 113 - 20 - sharkHeight / 2);
         }
 
         if (pref.getInteger("midnight") == 1 || pref.getInteger("midnight") == 2) {
-            font2.draw(sb, midnighttxt, midnights.getX() + (midnights.getWidth() / 2) - midnightWidth / 2,
-                    midnights.getY() + (midnights.getHeight() / 2) - 113 - 20 - midnightHeight / 2);
+            font2.draw(sb, midnighttxt, midnight.getX() + (midnight.getWidth() / 2) - midnightWidth / 2,
+                    midnight.getY() + (midnight.getHeight() / 2) - 113 - 20 - midnightHeight / 2);
         } else {
-            font.draw(sb, midnighttxt, midnights.getX() + (midnights.getWidth() / 2) - midnightWidth / 2,
-                    midnights.getY() + (midnights.getHeight() / 2) - 113 - 20 - midnightHeight / 2);
+            font.draw(sb, midnighttxt, midnight.getX() + (midnight.getWidth() / 2) - midnightWidth / 2,
+                    midnight.getY() + (midnight.getHeight() / 2) - 113 - 20 - midnightHeight / 2);
         }
 
         if (pref.getInteger("danube") == 1 || pref.getInteger("danube") == 2) {
-            font2.draw(sb, danubetxt, danubes.getX() + (danubes.getWidth() / 2) - danubeWidth / 2,
-                    danubes.getY() + (danubes.getHeight() / 2) - 113 - 20 - danubeHeight / 2);
+            font2.draw(sb, danubetxt, danube.getX() + (danube.getWidth() / 2) - danubeWidth / 2,
+                    danube.getY() + (danube.getHeight() / 2) - 113 - 20 - danubeHeight / 2);
         } else {
-            font.draw(sb, danubetxt, danubes.getX() + (danubes.getWidth() / 2) - danubeWidth / 2,
-                    danubes.getY() + (danubes.getHeight() / 2) - 113 - 20 - danubeHeight / 2);
+            font.draw(sb, danubetxt, danube.getX() + (danube.getWidth() / 2) - danubeWidth / 2,
+                    danube.getY() + (danube.getHeight() / 2) - 113 - 20 - danubeHeight / 2);
         }
 
         if (pref.getInteger("antimatter") == 1 || pref.getInteger("antimatter") == 2) {
-            font2.draw(sb, antimattertxt, antimatters.getX() + (antimatters.getWidth() / 2) - antimatterWidth / 2,
-                    antimatters.getY() + (antimatters.getHeight() / 2) - 113 - 20 - antimatterHeight / 2);
+            font2.draw(sb, antimattertxt, antimatter.getX() + (antimatter.getWidth() / 2) - antimatterWidth / 2,
+                    antimatter.getY() + (antimatter.getHeight() / 2) - 113 - 20 - antimatterHeight / 2);
         } else {
-            font.draw(sb, antimattertxt, antimatters.getX() + (antimatters.getWidth() / 2) - antimatterWidth / 2,
-                    antimatters.getY() + (antimatters.getHeight() / 2) - 113 - 20 - antimatterHeight / 2);
+            font.draw(sb, antimattertxt, antimatter.getX() + (antimatter.getWidth() / 2) - antimatterWidth / 2,
+                    antimatter.getY() + (antimatter.getHeight() / 2) - 113 - 20 - antimatterHeight / 2);
         }
 
         fontWarning.draw(sb, warningTxt, DotDrop.WIDTH / 2 - fontWidthWarning / 2, backBounds.getY());
@@ -1031,96 +954,96 @@ public class Unlocks {
         }
 
         if (pref.getInteger("lime") == 1 || pref.getInteger("lime") == 3) {
-            limes.setAlpha(a);
+            lime.setAlpha(a);
         } else {
-            limes.setAlpha(a / 4);
+            lime.setAlpha(a / 4);
         }
 
         if (pref.getInteger("aquamarine") == 3) {
-            aquamarines.setAlpha(1);
+            aquamarine.setAlpha(1);
         } else {
-            aquamarines.setAlpha(aAquamarine);
+            aquamarine.setAlpha(aAquamarine);
         }
 
         if (pref.getInteger("fire") == 1 || pref.getInteger("fire") == 3) {
-            fires.setAlpha(a);
+            fire.setAlpha(a);
         } else {
-            fires.setAlpha(a / 4);
+            fire.setAlpha(a / 4);
         }
 
         if (pref.getInteger("royal") == 1 || pref.getInteger("royal") == 3) {
-            royals.setAlpha(a);
+            royal.setAlpha(a);
         } else {
-            royals.setAlpha(a / 4);
+            royal.setAlpha(a / 4);
         }
 
         if (pref.getInteger("flamingo") == 1 || pref.getInteger("flamingo") == 3) {
-            flamingos.setAlpha(a);
+            flamingo.setAlpha(a);
         } else {
-            flamingos.setAlpha(a / 4);
+            flamingo.setAlpha(a / 4);
         }
 
         if (pref.getInteger("hotrod") == 1 || pref.getInteger("hotrod") == 3) {
-            hotrods.setAlpha(a);
+            hotrod.setAlpha(a);
         } else {
-            hotrods.setAlpha(a / 4);
+            hotrod.setAlpha(a / 4);
         }
 
         if (pref.getInteger("lilac") == 1 || pref.getInteger("lilac") == 3) {
-            lilacs.setAlpha(a);
+            lilac.setAlpha(a);
         } else {
-            lilacs.setAlpha(a / 4);
+            lilac.setAlpha(a / 4);
         }
 
         if (pref.getInteger("lemon") == 1 || pref.getInteger("lemon") == 3) {
-            lemons.setAlpha(a);
+            lemon.setAlpha(a);
         } else {
-            lemons.setAlpha(a / 4);
+            lemon.setAlpha(a / 4);
         }
 
         if (pref.getInteger("snow") == 1 || pref.getInteger("snow") == 3) {
-            snows.setAlpha(a);
+            snow.setAlpha(a);
         } else {
-            snows.setAlpha(a / 4);
+            snow.setAlpha(a / 4);
         }
 
         if (pref.getInteger("emerald") == 1 || pref.getInteger("emerald") == 3) {
-            emeralds.setAlpha(a);
+            emerald.setAlpha(a);
         } else {
-            emeralds.setAlpha(a / 4);
+            emerald.setAlpha(a / 4);
         }
 
         if (pref.getInteger("chestnut") == 1 || pref.getInteger("chestnut") == 3) {
-            chestnuts.setAlpha(a);
+            chestnut.setAlpha(a);
         } else {
-            chestnuts.setAlpha(a / 4);
+            chestnut.setAlpha(a / 4);
         }
 
         if (pref.getInteger("shark") == 1 || pref.getInteger("shark") == 3) {
-            sharks.setAlpha(a);
+            shark.setAlpha(a);
         } else {
-            sharks.setAlpha(a / 4);
+            shark.setAlpha(a / 4);
         }
 
         if (pref.getInteger("midnight") == 1 || pref.getInteger("midnight") == 3) {
-            midnights.setAlpha(a);
+            midnight.setAlpha(a);
         } else {
-            midnights.setAlpha(a / 4);
+            midnight.setAlpha(a / 4);
         }
 
         if (pref.getInteger("danube") == 1 || pref.getInteger("danube") == 3) {
-            danubes.setAlpha(a);
+            danube.setAlpha(a);
         } else {
-            danubes.setAlpha(a / 4);
+            danube.setAlpha(a / 4);
         }
 
         if (pref.getInteger("antimatter") == 1 || pref.getInteger("antimatter") == 3) {
-            antimatters.setAlpha(a);
+            antimatter.setAlpha(a);
         } else {
-            antimatters.setAlpha(a / 4);
+            antimatter.setAlpha(a / 4);
         }
 
-        backS.setAlpha(a);
+        back.setAlpha(a);
 
         font.setColor(1, 1, 1, a * (float) 0.4);
         font2.setColor(1, 1, 1, a * (float) 0.2);
@@ -1138,94 +1061,94 @@ public class Unlocks {
         }
 
         if (pref.getInteger("lime") == 1 || pref.getInteger("lime") == 3) {
-            limes.setAlpha(a);
+            lime.setAlpha(a);
         } else {
-            limes.setAlpha(a / 4);
+            lime.setAlpha(a / 4);
         }
 
         if (pref.getInteger("aquamarine") == 2) {
-            aquamarines.setAlpha(aAquamarine);
+            aquamarine.setAlpha(aAquamarine);
         }
 
         if (pref.getInteger("fire") == 1 || pref.getInteger("fire") == 3) {
-            fires.setAlpha(a);
+            fire.setAlpha(a);
         } else {
-            fires.setAlpha(a / 4);
+            fire.setAlpha(a / 4);
         }
 
         if (pref.getInteger("royal") == 1 || pref.getInteger("royal") == 3) {
-            royals.setAlpha(a);
+            royal.setAlpha(a);
         } else {
-            royals.setAlpha(a / 4);
+            royal.setAlpha(a / 4);
         }
 
         if (pref.getInteger("flamingo") == 1 || pref.getInteger("flamingo") == 3) {
-            flamingos.setAlpha(a);
+            flamingo.setAlpha(a);
         } else {
-            flamingos.setAlpha(a / 4);
+            flamingo.setAlpha(a / 4);
         }
 
         if (pref.getInteger("hotrod") == 1 || pref.getInteger("hotrod") == 3) {
-            hotrods.setAlpha(a);
+            hotrod.setAlpha(a);
         } else {
-            hotrods.setAlpha(a / 4);
+            hotrod.setAlpha(a / 4);
         }
 
         if (pref.getInteger("lilac") == 1 || pref.getInteger("lilac") == 3) {
-            lilacs.setAlpha(a);
+            lilac.setAlpha(a);
         } else {
-            lilacs.setAlpha(a / 4);
+            lilac.setAlpha(a / 4);
         }
 
         if (pref.getInteger("lemon") == 1 || pref.getInteger("lemon") == 3) {
-            lemons.setAlpha(a);
+            lemon.setAlpha(a);
         } else {
-            lemons.setAlpha(a / 4);
+            lemon.setAlpha(a / 4);
         }
 
         if (pref.getInteger("snow") == 1 || pref.getInteger("snow") == 3) {
-            snows.setAlpha(a);
+            snow.setAlpha(a);
         } else {
-            snows.setAlpha(a / 4);
+            snow.setAlpha(a / 4);
         }
 
         if (pref.getInteger("emerald") == 1 || pref.getInteger("emerald") == 3) {
-            emeralds.setAlpha(a);
+            emerald.setAlpha(a);
         } else {
-            emeralds.setAlpha(a / 4);
+            emerald.setAlpha(a / 4);
         }
 
         if (pref.getInteger("chestnut") == 1 || pref.getInteger("chestnut") == 3) {
-            chestnuts.setAlpha(a);
+            chestnut.setAlpha(a);
         } else {
-            chestnuts.setAlpha(a / 4);
+            chestnut.setAlpha(a / 4);
         }
 
         if (pref.getInteger("shark") == 1 || pref.getInteger("shark") == 3) {
-            sharks.setAlpha(a);
+            shark.setAlpha(a);
         } else {
-            sharks.setAlpha(a / 4);
+            shark.setAlpha(a / 4);
         }
 
         if (pref.getInteger("midnight") == 1 || pref.getInteger("midnight") == 3) {
-            midnights.setAlpha(a);
+            midnight.setAlpha(a);
         } else {
-            midnights.setAlpha(a / 4);
+            midnight.setAlpha(a / 4);
         }
 
         if (pref.getInteger("danube") == 1 || pref.getInteger("danube") == 3) {
-            danubes.setAlpha(a);
+            danube.setAlpha(a);
         } else {
-            danubes.setAlpha(a / 4);
+            danube.setAlpha(a / 4);
         }
 
         if (pref.getInteger("antimatter") == 1 || pref.getInteger("antimatter") == 3) {
-            antimatters.setAlpha(a);
+            antimatter.setAlpha(a);
         } else {
-            antimatters.setAlpha(a / 4);
+            antimatter.setAlpha(a / 4);
         }
 
-        backS.setAlpha(a);
+        back.setAlpha(a);
 
         font.setColor(1, 1, 1, a * (float) 0.4);
         font2.setColor(1, 1, 1, a * (float) 0.2);
@@ -1247,32 +1170,12 @@ public class Unlocks {
         dots[i].setAlpha(aDots[i]);
     }
 
-//    public void fadeInSelect(int i) {
-//        float alpha = a / 4;
-//        if (alpha < a) {
-//            alpha += 0.075;
-//        } else {
-//            alpha = a;
-//        }
-//        dots[i].setAlpha(alpha);
-//    }
-//
-//    public void fadeOutSelect(int i) {
-//        float alpha = a;
-//        if (alpha > a / 4) {
-//            alpha -= 0.075;
-//        } else {
-//            alpha = a / 4;
-//        }
-//        dots[i].setAlpha(alpha);
-//    }
-
     private void bg2sFadeIn() {
         aBg2s += 0.01;
         if (a >= 1) {
             a = 1;
         }
-        bg2S.setAlpha(a);
+        bg2.setAlpha(a);
     }
 
     private void bg2sFadeOut() {
@@ -1280,7 +1183,7 @@ public class Unlocks {
         if (a <= 0) {
             a = 0;
         }
-        bg2S.setAlpha(a);
+        bg2.setAlpha(a);
     }
 
     public void setSelected(String dot) {
@@ -1292,115 +1195,26 @@ public class Unlocks {
             pref.putInteger("selected", pref.getInteger("selected") + 1);
         }
         pref.flush();
-//        if (pref.getInteger("lime") == 3) {
-//            pref.putInteger("lime", 2);
-//        } else if (pref.getInteger("lime") == 2) {
-//            pref.putInteger("lime", 3);
-//        }
-//
-//        if (pref.getInteger("aquamarine") == 3) {
-//            pref.putInteger("aquamarine", 2);
-//        } else if (pref.getInteger("aquamarine") == 2) {
-//            pref.putInteger("aquamarine", 3);
-//        }
-//
-//        if (pref.getInteger("fire") == 3) {
-//            pref.putInteger("fire", 2);
-//        } else if (pref.getInteger("fire") == 2) {
-//            pref.putInteger("fire", 3);
-//        }
-//
-//        if (pref.getInteger("royal") == 3) {
-//            pref.putInteger("royal", 2);
-//        } else if (pref.getInteger("royal") == 2) {
-//            pref.putInteger("royal", 3);
-//        }
-//
-//        if (pref.getInteger("flamingo") == 3) {
-//            pref.putInteger("flamingo", 2);
-//        } else if (pref.getInteger("flamingo") == 2) {
-//            pref.putInteger("flamingo", 3);
-//        }
-//
-//        if (pref.getInteger("hotrod") == 3) {
-//            pref.putInteger("hotrod", 2);
-//        } else if (pref.getInteger("hotrod") == 2) {
-//            pref.putInteger("hotrod", 3);
-//        }
-//
-//        if (pref.getInteger("lilac") == 3) {
-//            pref.putInteger("lilac", 2);
-//        } else if (pref.getInteger("lilac") == 2) {
-//            pref.putInteger("lilac", 3);
-//        }
-//
-//        if (pref.getInteger("lemon") == 3) {
-//            pref.putInteger("lemon", 2);
-//        } else if (pref.getInteger("lemon") == 2) {
-//            pref.putInteger("lemon", 3);
-//        }
-//
-//        if (pref.getInteger("snow") == 3) {
-//            pref.putInteger("snow", 2);
-//        } else if (pref.getInteger("snow") == 2) {
-//            pref.putInteger("snow", 3);
-//        }
-//
-//        if (pref.getInteger("emerald") == 3) {
-//            pref.putInteger("emerald", 2);
-//        } else if (pref.getInteger("emerald") == 2) {
-//            pref.putInteger("emerald", 3);
-//        }
-//
-//        if (pref.getInteger("chestnut") == 3) {
-//            pref.putInteger("chestnut", 2);
-//        } else if (pref.getInteger("chestnut") == 2) {
-//            pref.putInteger("chestnut", 3);
-//        }
-//
-//        if (pref.getInteger("shark") == 3) {
-//            pref.putInteger("shark", 2);
-//        } else if (pref.getInteger("shark") == 2) {
-//            pref.putInteger("shark", 3);
-//        }
-//
-//        if (pref.getInteger("midnight") == 3) {
-//            pref.putInteger("midnight", 2);
-//        } else if (pref.getInteger("midnight") == 2) {
-//            pref.putInteger("midnight", 3);
-//        }
-//
-//        if (pref.getInteger("danube") == 3) {
-//            pref.putInteger("danube", 2);
-//        } else if (pref.getInteger("danube") == 2) {
-//            pref.putInteger("danube", 3);
-//        }
-//
-//        if (pref.getInteger("antimatter") == 3) {
-//            pref.putInteger("antimatter", 2);
-//        } else if (pref.getInteger("antimatter") == 2) {
-//            pref.putInteger("antimatter", 3);
-//        }
     }
 
     public void dispose() {
-        lime.dispose();
-        aquamarine.dispose();
-        fire.dispose();
-        royal.dispose();
-        flamingo.dispose();
-        hotrod.dispose();
-        lilac.dispose();
-        lemon.dispose();
-        snow.dispose();
-        emerald.dispose();
-        chestnut.dispose();
-        shark.dispose();
-        midnight.dispose();
-        danube.dispose();
-        antimatter.dispose();
-        bg2.dispose();
-        back.dispose();
+        lime.getTexture().dispose();
+        aquamarine.getTexture().dispose();
+        fire.getTexture().dispose();
+        royal.getTexture().dispose();
+        flamingo.getTexture().dispose();
+        hotrod.getTexture().dispose();
+        lilac.getTexture().dispose();
+        lemon.getTexture().dispose();
+        snow.getTexture().dispose();
+        emerald.getTexture().dispose();
+        chestnut.getTexture().dispose();
+        shark.getTexture().dispose();
+        midnight.getTexture().dispose();
+        danube.getTexture().dispose();
+        antimatter.getTexture().dispose();
+        bg2.getTexture().dispose();
+        back.getTexture().dispose();
         font.dispose();
         font2.dispose();
         fontWarning.dispose();

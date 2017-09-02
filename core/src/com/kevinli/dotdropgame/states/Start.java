@@ -103,6 +103,8 @@ public class Start extends State implements InputProcessor{
     public void update(float dt) {
         handleInput();
         dot.update(dt);
+
+        // Fade in transition plays if alpha is greater than 0
         if (!fadeIn) {
             fade(true);
             if (a <= 0) {
@@ -110,18 +112,18 @@ public class Start extends State implements InputProcessor{
             }
         }
 
+        // Open and close animations for unlocks
         if (openUnlock == 1) {
             unlocks.open(dt);
             unlocks.fadeIn();
+            // Fade in and fade out animation when selecting or deselecting dots in unlocks screen
+            unlocks.fadeSelect(unlocks.getDotNames()[dotSelect], dotSelect);
         } else if (openUnlock == 2) {
             unlocks.close(dt);
             unlocks.fadeOut();
         }
 
-        if ((openUnlock == 1 && tDownDots[dotSelect]) || (openUnlock == 1 && !tDownDots[dotSelect])) {
-            unlocks.fadeSelect(unlocks.getDotNames()[dotSelect], dotSelect);
-        }
-
+        // If start dot goes out of bounds, play fade out animation then start Game
         if ((dot.getPosition().x >= DotDrop.WIDTH) || (dot.getPosition().x + 650 <= 0)
                 || (dot.getPosition().y >= DotDrop.HEIGHT) || (dot.getPosition().y + 650 <= 0)) {
             fade(false);
@@ -141,19 +143,17 @@ public class Start extends State implements InputProcessor{
         star.draw(sb);
         downarrow.draw(sb);
         sb.draw(dot.getTexture(), dot.getPosition().x, dot.getPosition().y);
-        unlocks.getBg2S().draw(sb);
-//        sb.draw(unlocks.getSprite()[1], unlocks.getPosition().get(1).x, unlocks.getPosition().get(1).y);
+        unlocks.getBg2().draw(sb);
         unlocks.getSprite()[1].setPosition(unlocks.getPosition().get(1).x, unlocks.getPosition().get(1).y);
         unlocks.getSprite()[1].draw(sb);
         for (int i = 0; i < 15; i++) {
             if (i != 1) {
                 unlocks.getSprite()[i].setPosition(unlocks.getPosition().get(i).x, unlocks.getPosition().get(i).y);
                 unlocks.getSprite()[i].draw(sb);
-                //sb.draw(unlocks.getSprite()[i], unlocks.getPosition().get(i).x, unlocks.getPosition().get(i).y);
             }
         }
         unlocks.drawText(sb);
-        unlocks.getBackS().draw(sb);
+        unlocks.getBack().draw(sb);
 
         sb.end();
         Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -189,6 +189,7 @@ public class Start extends State implements InputProcessor{
 
     @Override
     public boolean keyUp(int keycode) {
+        // If unlocks is open, then pressing the back key will close it
         if (keycode == Input.Keys.BACK && openUnlock == 1) {
             openUnlock = 2;
         }
@@ -202,8 +203,11 @@ public class Start extends State implements InputProcessor{
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        // Sets touch coordinates relative to local screen resolution
         touch.set(screenX, screenY, 0);
         cam.unproject(touch);
+
+        // If unlocks is closed and the start dot is touched, then record initial positions of touch
         if (dot.getBounds().contains(touch.x, touch.y) && openUnlock != 1) {
             tDownStartDot = true;
             firstTouch.set(touch.x, touch.y);
@@ -212,12 +216,14 @@ public class Start extends State implements InputProcessor{
                     touch.y - dot.getPosition().y);
         }
 
+        // Open or close unlocks
         if (unlocks.getBounds().get(1).contains(touch.x, touch.y) && openUnlock != 1) {
             tDownUnlocksOpen = true;
         } else if (unlocks.getBackBounds().contains(touch.x, touch.y)) {
             tDownUnlocksClose = true;
         }
 
+        // Select or deselect dots when unlocks is open
         if (openUnlock == 1) {
             for (int i = 0; i < 15; i++) {
                 if (unlocks.getBounds().get(i).contains(touch.x, touch.y)) {
@@ -226,22 +232,17 @@ public class Start extends State implements InputProcessor{
                 }
             }
         }
-//
-//        if (unlocks.getBounds().get(1).contains(screenX, DotDrop.HEIGHT - screenY)) {
-//            System.out.println(screenX + "    " + screenY);
-//            tDownUnlocksOpen = true;
-//            firstTouchU = screenY;
-//            originalU = screenY;
-//            touchDownDeltaU = DotDrop.HEIGHT - screenY - dot.getPosition().y;
-//        }
 
         return true;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        // Sets touch coordinates relative to local screen resolution
         touch.set(screenX, screenY, 0);
         cam.unproject(touch);
+
+        // When start dot is released, send velocity values to start dot object
         if (tDownStartDot) {
             Vector2 total = new Vector2();
             tDownStartDot = false;
@@ -255,11 +256,6 @@ public class Start extends State implements InputProcessor{
         tDownStartDot = false;
 
         if (tDownUnlocksOpen && unlocks.getBounds().get(1).contains(touch.x, touch.y)) {
-//            if (openUnlock == 0 || openUnlock == 2) {
-//                openUnlock = 1;
-//            } else {
-//                openUnlock = 2;
-//            }
             openUnlock = 1;
             tDownUnlocksOpen = false;
         } else {
@@ -280,12 +276,13 @@ public class Start extends State implements InputProcessor{
         return true;
     }
 
-    // TODO: Fling feels a bit weird, maybe decrease update rate
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         touch.set(screenX, screenY, 0);
         cam.unproject(touch);
         float dt = Gdx.graphics.getDeltaTime();
+
+        // Sets the last 10 velocity values and averages them to achieve initial velocity of start dot
         if (tDownStartDot) {
             dot.setTDown(tDownStartDot);
             dot.setTDragged(true);
@@ -327,14 +324,6 @@ public class Start extends State implements InputProcessor{
             dot.setPosition(touch.x - touchDownDelta.x,
                     touch.y - touchDownDelta.y);
         }
-
-//        if (tDownUnlocksOpen) {
-//            float currentTouchU = screenY;
-//            deltaU = currentTouchU - firstTouchU;
-//            firstTouchU = currentTouchU;
-//            velocityU = deltaU / dt;
-//            unlocks.setPosition(DotDrop.HEIGHT - screenY);
-//        }
 
         return true;
     }

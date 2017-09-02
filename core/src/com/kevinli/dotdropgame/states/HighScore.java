@@ -186,7 +186,6 @@ public class HighScore extends State implements InputProcessor {
             hsLargeTxt1 = "";
             hsLargeTxt2 = "SCORE";
         }
-        // TODO: Make font and set them
         fontScore = new BitmapFont(Gdx.files.internal("mulicolor.fnt"));
         fontL = new BitmapFont(Gdx.files.internal("mulil.fnt"));
         fontS = new BitmapFont(Gdx.files.internal("mulis.fnt"));

@@ -25,7 +25,7 @@ import com.badlogic.gdx.math.Vector2;
  */
 
 public class GameDot {
-    private static final int GRAVITY = -25;                                                         // Change gravity value
+    private static final int GRAVITY = -25;
     private Vector2 position;
     private Vector2 velocity;
     private Rectangle bounds;
@@ -41,8 +41,7 @@ public class GameDot {
         }
         position = new Vector2(x, y);
         velocity = new Vector2(0, 0);
-        bounds = new Rectangle(x + 78, y + 72, 156, 156);                                           // Change radius of image (not bounds) (100)
-                                                                                                    //      Change radius of bounds (50)
+        bounds = new Rectangle(x + 78, y + 72, 156, 156);
     }
 
     public void update(float dt) {
@@ -53,7 +52,7 @@ public class GameDot {
         velocity.scl(dt);
         position.add(0, velocity.y);
         velocity.scl(1 / dt);
-        bounds.setPosition(position.x + 78, position.y + 72);                                       // Change radius of image (not bounds) (100)
+        bounds.setPosition(position.x + 78, position.y + 72);
     }
 
     public void fadeOut() {

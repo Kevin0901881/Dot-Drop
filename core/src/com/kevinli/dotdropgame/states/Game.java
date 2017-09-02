@@ -44,24 +44,30 @@ public class Game extends State {
     private static final int Y_SPACING_MIN = 20;
     private static final int Y_SPACING_MAX = 35;
 
-    private Preferences pref;
+    private AssetManager assets;
+    private TextureAtlas atlas;
 
+    private DotDrop dd;
+    private Preferences pref;
+    private ArrayList<GameDot> gameDots;
+    private ShapeRenderer sr;
+
+    private int n;
+    private int highestN;
+    private Random rand;
+
+    // X coordinate of the next dot to be generated
     private int x;
 
-    private ArrayList<GameDot> gameDots;
-    private float[] v;
-
+    // Distance passed for next dot to be generated
     private int distanceY;
+    // Number of dots that have been generated
     private int passby = 0;
 
     private Texture line;
     private Texture minidot;
 
     private Rectangle lineBounds;
-
-    private Random rand;
-    private int n;
-    private int highestN;
 
     private int score = 0;
     private String scoreStr;
@@ -80,45 +86,41 @@ public class Game extends State {
     private float fontMessageHeight;
     private float fontMessage2Height;
 
-    private ShapeRenderer sr;
-
-    private float a;
+    private float a = 1;
     private float aMessage = 0;
 
     private Sound hit;
     private Sound lose;
 
-    private FPSLogger fpsl;
-
-    private DotDrop dd;
-
-    private AssetManager assets;
-    private TextureAtlas atlas;
-
     private boolean runTutorial;
     private boolean paused;
+    // Outputs fps to console every second
+    private FPSLogger fpsl;
 
     public Game(GameStateManager gsm, DotDrop dd) {
         super(gsm);
-        pref = Gdx.app.getPreferences("com.kevin.dotdropgame.settings");
         assets = new AssetManager();
         assets.load("dots.pack", TextureAtlas.class);
         assets.finishLoading();
         atlas = assets.get("dots.pack");
 
         this.dd = dd;
-        rand = new Random();
-        sr = new ShapeRenderer();
-        x = rand.nextInt(920) - 70;
-        setHighestN();
+        pref = Gdx.app.getPreferences("com.kevin.dotdropgame.settings");
         gameDots = new ArrayList<GameDot>();
+        rand = new Random();
+        // Sets highestN to the highest unlocked dot
+        setHighestN();
+        // Sets n to a number between the highest and lowest dot, excluding unselected dots
+        n = generateRandom();
         int random = generateRandom();
         gameDots.add(new GameDot(x, DotDrop.HEIGHT, 0, random));
+        sr = new ShapeRenderer();
+
+        x = rand.nextInt(920) - 70;
+
+        distanceY = rand.nextInt(Y_SPACING_MAX - Y_SPACING_MIN + 1) + Y_SPACING_MIN;
         passby++;
-        lineBounds = new Rectangle(0, 200, DotDrop.WIDTH, 4);
-        a = 1;
-        n = generateRandom();
-        scoreStr = Integer.toString(score);
+
         if (n == 1) {
             line = new Texture("limeline.png");
             minidot = new Texture("minilime.png");
@@ -165,7 +167,9 @@ public class Game extends State {
             line = new Texture("antimatterline.png");
             minidot = new Texture("miniantimatter.png");
         }
-        cam.setToOrtho(false, DotDrop.WIDTH, DotDrop.HEIGHT);
+        lineBounds = new Rectangle(0, 200, DotDrop.WIDTH, 4);
+
+        scoreStr = Integer.toString(score);
         font = new BitmapFont(Gdx.files.internal("muli.fnt"));
         fontMessage = new BitmapFont(Gdx.files.internal("mulisemi.fnt"));
         font.setColor(1, 1, 1, 0.2f);
@@ -182,19 +186,23 @@ public class Game extends State {
         fontMessageHeight = glMessage.height;
         fontMessage2Width = glMessage2.width;
         fontMessage2Height = glMessage2.height;
+
         hit = Gdx.audio.newSound(Gdx.files.internal("dotsfx.mp3"));
         lose = Gdx.audio.newSound(Gdx.files.internal("losesfx.mp3"));
+
+        // Resets the current score to 0
         if (!pref.contains("currentHighscore")) {
             pref.putInteger("currentHighscore", 0);
             pref.flush();
         }
+
+        // Sets the volume to on
         if (!pref.contains("volume")) {
             pref.putInteger("volume", 1);
             pref.flush();
         }
-        distanceY = rand.nextInt(Y_SPACING_MAX - Y_SPACING_MIN + 1) + Y_SPACING_MIN;
-        fpsl = new FPSLogger();
 
+        // Initiates tutorial on first startup or when help button is pressed
         if (!pref.contains("tutorial")) {
             pref.putInteger("tutorial", 1);
             pref.flush();
@@ -204,6 +212,10 @@ public class Game extends State {
             pref.flush();
             runTutorial = true;
         }
+
+        fpsl = new FPSLogger();
+
+        cam.setToOrtho(false, DotDrop.WIDTH, DotDrop.HEIGHT);
     }
 
     @Override

@@ -19,15 +19,12 @@ public class StartDot {
     private boolean tDragged;
     // If touched down, gravity won't be applied
     private boolean tDownStartDot;
-    private float x;
 
     public StartDot(float x, float y) {
         position = new Vector2(x, y);
         velocity = new Vector2(0, 0);
         dot = new Texture("startdot.png");
-        this.x = x;
-        bounds = new Circle(x + 325, y + 325, 230);                                                 // Change radius of image (not bounds) (400)
-                                                                                                    //      Change radius of bounds (187)
+        bounds = new Circle(x + 325, y + 325, 230);
     }
 
     public void update(float dt) {
@@ -41,7 +38,7 @@ public class StartDot {
         } else {
             velocity.scl(1 / (float) 0.017);
         }
-        bounds.setPosition(position.x + 325, position.y + 325);                                     // Change radius of image (not bounds) (400)
+        bounds.setPosition(position.x + 325, position.y + 325);
     }
 
     public void dotFling(float x, float y) {
