@@ -51,7 +51,7 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 		MobileAds.initialize(this, "ca-app-pub-4100073104591330~2983194449");
 
 		interstitialAd = new InterstitialAd(this);
-		interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+		interstitialAd.setAdUnitId("ca-app-pub-4100073104591330/4483978375");
 		interstitialAd.loadAd(new AdRequest.Builder().build());
 
 		gameHelper = new GameHelper(this, GameHelper.CLIENT_GAMES);
