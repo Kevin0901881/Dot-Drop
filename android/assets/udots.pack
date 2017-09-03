@@ -1,0 +1,125 @@
+
+udots.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+uantimatter
+  rotate: false
+  xy: 1, 474
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
+uaquamarine
+  rotate: false
+  xy: 1, 1
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
+uchestnut
+  rotate: false
+  xy: 474, 474
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
+udanube
+  rotate: false
+  xy: 474, 1
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
+
+udots2.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+uemerald
+  rotate: false
+  xy: 1, 474
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
+ufire
+  rotate: false
+  xy: 1, 1
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
+uflamingo
+  rotate: false
+  xy: 474, 474
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
+uhotrod
+  rotate: false
+  xy: 474, 1
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
+
+udots3.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+ulemon
+  rotate: false
+  xy: 1, 474
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
+ulilac
+  rotate: false
+  xy: 1, 1
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
+ulime
+  rotate: false
+  xy: 474, 474
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
+umidnight
+  rotate: false
+  xy: 474, 1
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
+
+udots4.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+uroyal
+  rotate: false
+  xy: 1, 474
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
+ushark
+  rotate: false
+  xy: 1, 1
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
+usnow
+  rotate: false
+  xy: 474, 474
+  size: 471, 471
+  orig: 471, 471
+  offset: 0, 0
+  index: -1
