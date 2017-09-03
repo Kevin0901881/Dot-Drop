@@ -41,7 +41,7 @@ public class GameDot {
         }
         position = new Vector2(x, y);
         velocity = new Vector2(0, 0);
-        bounds = new Rectangle(x + 78, y + 72, 156, 156);
+        bounds = new Rectangle(x + 75, y + 75, 150, 150);
     }
 
     public void update(float dt) {
@@ -52,7 +52,7 @@ public class GameDot {
         velocity.scl(dt);
         position.add(0, velocity.y);
         velocity.scl(1 / dt);
-        bounds.setPosition(position.x + 78, position.y + 72);
+        bounds.setPosition(position.x + 75, position.y + 75);
     }
 
     public void fadeOut() {

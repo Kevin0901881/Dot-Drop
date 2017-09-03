@@ -3,8 +3,12 @@ package com.kevinli.dotdropgame;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kevinli.dotdropgame.states.GameStateManager;
 import com.kevinli.dotdropgame.states.Start;
 
@@ -21,6 +25,9 @@ public class DotDrop extends ApplicationAdapter {
 
 	private Preferences pref;
 
+	private Viewport viewport;
+	private Camera cam;
+
 	public DotDrop(ActionResolver ar, PlayServices playServices) {
 		this.ar = ar;
 		this.playServices = playServices;
@@ -35,6 +42,8 @@ public class DotDrop extends ApplicationAdapter {
 		}
 		pref.putInteger("adCounter", 0);
 		pref.flush();
+		cam = new OrthographicCamera();
+		viewport = new FitViewport(DotDrop.WIDTH, DotDrop.HEIGHT, cam);
 		batch = new SpriteBatch();
 		gsm = new GameStateManager();
 		Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -61,7 +70,12 @@ public class DotDrop extends ApplicationAdapter {
 	public void resume() {
 
 	}
-	
+
+	@Override
+	public void resize(int width, int height) {
+		viewport.update(width, height);
+	}
+
 	@Override
 	public void dispose () {
 		super.dispose();

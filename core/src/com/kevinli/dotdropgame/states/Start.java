@@ -205,7 +205,13 @@ public class Start extends State implements InputProcessor{
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         // Sets touch coordinates relative to local screen resolution
         touch.set(screenX, screenY, 0);
-        cam.unproject(touch);
+        if (Gdx.graphics.getHeight() / 16 * 9 >= Gdx.graphics.getWidth()) {
+            cam.unproject(touch, 0, Gdx.graphics.getHeight() / 2 - (Gdx.graphics.getWidth() * 16 / 9 / 2),
+                    Gdx.graphics.getWidth(), Gdx.graphics.getWidth() * 16 / 9);
+        } else {
+            cam.unproject(touch, Gdx.graphics.getWidth() / 2 - (Gdx.graphics.getHeight() * 9 / 16 / 2), 0,
+                    Gdx.graphics.getHeight() * 9 / 16, Gdx.graphics.getHeight());
+        }
 
         // If unlocks is closed and the start dot is touched, then record initial positions of touch
         if (dot.getBounds().contains(touch.x, touch.y) && openUnlock != 1) {
@@ -240,7 +246,13 @@ public class Start extends State implements InputProcessor{
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         // Sets touch coordinates relative to local screen resolution
         touch.set(screenX, screenY, 0);
-        cam.unproject(touch);
+        if (Gdx.graphics.getHeight() / 16 * 9 >= Gdx.graphics.getWidth()) {
+            cam.unproject(touch, 0, Gdx.graphics.getHeight() / 2 - (Gdx.graphics.getWidth() * 16 / 9 / 2),
+                    Gdx.graphics.getWidth(), Gdx.graphics.getWidth() * 16 / 9);
+        } else {
+            cam.unproject(touch, Gdx.graphics.getWidth() / 2 - (Gdx.graphics.getHeight() * 9 / 16 / 2), 0,
+                    Gdx.graphics.getHeight() * 9 / 16, Gdx.graphics.getHeight());
+        }
 
         // When start dot is released, send velocity values to start dot object
         if (tDownStartDot) {
@@ -279,7 +291,13 @@ public class Start extends State implements InputProcessor{
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         touch.set(screenX, screenY, 0);
-        cam.unproject(touch);
+        if (Gdx.graphics.getHeight() / 16 * 9 >= Gdx.graphics.getWidth()) {
+            cam.unproject(touch, 0, Gdx.graphics.getHeight() / 2 - (Gdx.graphics.getWidth() * 16 / 9 / 2),
+                    Gdx.graphics.getWidth(), Gdx.graphics.getWidth() * 16 / 9);
+        } else {
+            cam.unproject(touch, Gdx.graphics.getWidth() / 2 - (Gdx.graphics.getHeight() * 9 / 16 / 2), 0,
+                    Gdx.graphics.getHeight() * 9 / 16, Gdx.graphics.getHeight());
+        }
         float dt = Gdx.graphics.getDeltaTime();
 
         // Sets the last 10 velocity values and averages them to achieve initial velocity of start dot

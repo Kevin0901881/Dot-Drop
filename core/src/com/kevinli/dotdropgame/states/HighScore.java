@@ -264,7 +264,13 @@ public class HighScore extends State implements InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         touch.set(screenX, screenY, 0);
-        cam.unproject(touch);
+        if (Gdx.graphics.getHeight() / 16 * 9 >= Gdx.graphics.getWidth()) {
+            cam.unproject(touch, 0, Gdx.graphics.getHeight() / 2 - (Gdx.graphics.getWidth() * 16 / 9 / 2),
+                    Gdx.graphics.getWidth(), Gdx.graphics.getWidth() * 16 / 9);
+        } else {
+            cam.unproject(touch, Gdx.graphics.getWidth() / 2 - (Gdx.graphics.getHeight() * 9 / 16 / 2), 0,
+                    Gdx.graphics.getHeight() * 9 / 16, Gdx.graphics.getHeight());
+        }
         if (startBound.contains(touch.x, touch.y) && touchStart == 0) {
             touchStart = 1;
             aStart = 0.5f;
@@ -293,7 +299,13 @@ public class HighScore extends State implements InputProcessor {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         touch.set(screenX, screenY, 0);
-        cam.unproject(touch);
+        if (Gdx.graphics.getHeight() / 16 * 9 >= Gdx.graphics.getWidth()) {
+            cam.unproject(touch, 0, Gdx.graphics.getHeight() / 2 - (Gdx.graphics.getWidth() * 16 / 9 / 2),
+                    Gdx.graphics.getWidth(), Gdx.graphics.getWidth() * 16 / 9);
+        } else {
+            cam.unproject(touch, Gdx.graphics.getWidth() / 2 - (Gdx.graphics.getHeight() * 9 / 16 / 2), 0,
+                    Gdx.graphics.getHeight() * 9 / 16, Gdx.graphics.getHeight());
+        }
         if (touchStart == 1 && startBound.contains(touch.x, touch.y)) {
             touchStart = 2;
             aStart = 1;
@@ -351,12 +363,14 @@ public class HighScore extends State implements InputProcessor {
             touchShare = 0;
             touchRate = 0;
             touchLeaderboards = 0;
+            touchHelp = 0;
             aStart = 1;
             aReplay = 1;
             aVolume = 1;
             aShare = 1;
             aRate = 1;
             aLeaderboards = 1;
+            aHelp = 1;
         }
         return true;
     }

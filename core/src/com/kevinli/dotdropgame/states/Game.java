@@ -71,8 +71,8 @@ public class Game extends State {
 
     private int score = 0;
     private String scoreStr;
-    private String message = "Tap when the line overlaps";
-    private String message2 = "the dot of the same color";
+    private String message = "Tap anywhere on the screen when the line";
+    private String message2 = "overlaps a dot of the same color";
 
     private BitmapFont font;
     private BitmapFont fontMessage;
@@ -113,7 +113,6 @@ public class Game extends State {
         // Sets n to a number between the highest and lowest dot, excluding unselected dots
         n = generateRandom();
         int random = generateRandom();
-        gameDots.add(new GameDot(x, DotDrop.HEIGHT, 0, random));
         sr = new ShapeRenderer();
 
         x = rand.nextInt(920) - 70;
@@ -206,11 +205,15 @@ public class Game extends State {
         if (!pref.contains("tutorial")) {
             pref.putInteger("tutorial", 1);
             pref.flush();
+            gameDots.add(new GameDot(x, DotDrop.HEIGHT, n, 0));
             runTutorial = true;
         } else if (pref.getInteger("tutorial") == 0) {
             pref.putInteger("tutorial", 1);
             pref.flush();
+            gameDots.add(new GameDot(x, DotDrop.HEIGHT, n, 0));
             runTutorial = true;
+        } else {
+            gameDots.add(new GameDot(x, DotDrop.HEIGHT, 0, random));
         }
 
         fpsl = new FPSLogger();
