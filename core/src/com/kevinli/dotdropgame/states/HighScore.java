@@ -230,19 +230,19 @@ public class HighScore extends State implements InputProcessor {
         } if (!pref.contains("legend")) {
             pref.putBoolean("legend", false);
         }
-        if (pref.getInteger("currentHighscore") >= 5 && !pref.getBoolean("rookie")) {
+        if (pref.getInteger("highscore") >= 25 && !pref.getBoolean("rookie")) {
             dd.playServices.unlockAchievement(1);
         }
-        if (pref.getInteger("currentHighscore") >= 6 && !pref.getBoolean("novice")) {
+        if (pref.getInteger("highscore") >= 50 && !pref.getBoolean("novice")) {
             dd.playServices.unlockAchievement(2);
         }
-        if (pref.getInteger("currentHighscore") >= 100 && !pref.getBoolean("pro")) {
+        if (pref.getInteger("highscore") >= 100 && !pref.getBoolean("pro")) {
             dd.playServices.unlockAchievement(3);
         }
-        if (pref.getInteger("currentHighscore") >= 500 && !pref.getBoolean("master")) {
+        if (pref.getInteger("highscore") >= 500 && !pref.getBoolean("master")) {
             dd.playServices.unlockAchievement(4);
         }
-        if (pref.getInteger("currentHighscore") >= 1000 && !pref.getBoolean("legend")) {
+        if (pref.getInteger("highscore") >= 1000 && !pref.getBoolean("legend")) {
             dd.playServices.unlockAchievement(5);
         }
         pref.putInteger("adCounter", pref.getInteger("adCounter") + 1);
