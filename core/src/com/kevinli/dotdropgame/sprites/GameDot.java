@@ -31,7 +31,6 @@ public class GameDot {
     private Rectangle bounds;
     private int n;
     private boolean cleared = false;
-    private boolean touched = false;
 
     public GameDot(int x, int y, int n2, int nRand) {
         if (n2 == 0) {
@@ -55,10 +54,6 @@ public class GameDot {
         bounds.setPosition(position.x + 75, position.y + 75);
     }
 
-    public void fadeOut() {
-        touched = true;
-    }
-
     public Vector2 getPosition() {
         return position;
     }
@@ -71,23 +66,11 @@ public class GameDot {
         return n;
     }
 
-    public boolean getTouched() {
-        return touched;
-    }
-
-    public float getVelocity() {
-        return velocity.y;
-    }
-
     public boolean getCleared() {
         return cleared;
     }
 
     public void setCleared(boolean clear) {
         cleared = clear;
-    }
-
-    public void setVelocity(float v) {
-        velocity.y = v;
     }
 }

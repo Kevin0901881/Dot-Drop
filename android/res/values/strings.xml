@@ -4,6 +4,10 @@
     <string name="app_name">Dot Drop</string>
     <string name="app_id">689158441535</string>
     <string name="highest_score">CgkIv5StqIcUEAIQAA</string>
+    <string name="dot_drop_rookie">CgkIv5StqIcUEAIQAw</string>
+    <string name="dot_drop_novice">CgkIv5StqIcUEAIQBA</string>
+    <string name="dot_drop_pro">CgkIv5StqIcUEAIQBQ</string>
     <string name="dot_drop_master">CgkIv5StqIcUEAIQAQ</string>
+    <string name="dot_drop_legend">CgkIv5StqIcUEAIQBg</string>
 
 </resources>

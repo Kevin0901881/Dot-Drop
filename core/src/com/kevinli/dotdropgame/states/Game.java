@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -95,7 +94,7 @@ public class Game extends State {
     private boolean runTutorial;
     private boolean paused;
     // Outputs fps to console every second
-    private FPSLogger fpsl;
+//    private FPSLogger fpsl;
 
     public Game(GameStateManager gsm, DotDrop dd) {
         super(gsm);
@@ -216,7 +215,7 @@ public class Game extends State {
             gameDots.add(new GameDot(x, DotDrop.HEIGHT, 0, random));
         }
 
-        fpsl = new FPSLogger();
+//        fpsl = new FPSLogger();
 
         cam.setToOrtho(false, DotDrop.WIDTH, DotDrop.HEIGHT);
     }
@@ -225,18 +224,17 @@ public class Game extends State {
     protected void handleInput() {
         if(Gdx.input.justTouched()) {
             for (GameDot dots : gameDots) {
-                if (dots.getBounds().overlaps(lineBounds) && dots.getn() == n && !dots.getTouched()) {
+                if (dots.getn() == n && dots.getBounds().overlaps(lineBounds)) {
                     if (pref.getInteger("volume") == 1) {
                         hit.play();
                     }
-                    dots.fadeOut();
                     dots.setCleared(true);
                     score++;
                     scoreStr = Integer.toString(score);
                     gl.setText(font, scoreStr);
                     fontWidth = gl.width;
                     fontHeight = gl.height;
-                } else if (dots.getBounds().overlaps(lineBounds) && !dots.getTouched()) {
+                } else if (dots.getBounds().overlaps(lineBounds)) {
                     pref.putInteger("currentHighscore", score);
                     pref.flush();
                     setPrefs();
@@ -262,10 +260,8 @@ public class Game extends State {
         } else {
             for (GameDot dots : gameDots) {
                 if ((runTutorial && dots.getBounds().overlaps(lineBounds) && dots.getn() == n) || paused) {
-                    if (dots.getn() == n && dots.getBounds().overlaps(lineBounds)) {
-                        paused = true;
-                        pause();
-                    }
+                    paused = true;
+                    pause();
                 } else {
                     dots.update(dt);
                 }
@@ -306,7 +302,7 @@ public class Game extends State {
 
     @Override
     public void render(SpriteBatch sb) {
-        fpsl.log();
+//        fpsl.log();
         Gdx.gl.glClearColor(21/255f, 21/255f, 21/255f, 1);
         sb.setProjectionMatrix(cam.combined);
         sb.begin();

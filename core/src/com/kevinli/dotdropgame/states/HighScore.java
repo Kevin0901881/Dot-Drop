@@ -219,8 +219,35 @@ public class HighScore extends State implements InputProcessor {
         yL1 = DotDrop.HEIGHT / 2 + fontHeightScore / 2 + 95 + fontHeightL2 + 30 - 30;
         yThreeStars = DotDrop.HEIGHT / 2 + fontHeightScore / 2 + 80 + fontHeightL2 + 20 + fontHeightL1 + 20 - 30;
         sr = new ShapeRenderer();
-        if (pref.getInteger("currentHighscore") >= 1000) {
-            dd.playServices.unlockAchievement();
+        if (!pref.contains("rookie")) {
+            pref.putBoolean("rookie", false);
+        } if (!pref.contains("novice")) {
+            pref.putBoolean("novice", false);
+        } if (!pref.contains("pro")) {
+            pref.putBoolean("pro", false);
+        } if (!pref.contains("master")) {
+            pref.putBoolean("master", false);
+        } if (!pref.contains("legend")) {
+            pref.putBoolean("legend", false);
+        }
+        if (pref.getInteger("currentHighscore") >= 25 && !pref.getBoolean("rookie")) {
+            dd.playServices.unlockAchievement(1);
+            dd.playServices.showAchievement();
+        }
+        if (pref.getInteger("currentHighscore") >= 50 && !pref.getBoolean("novice")) {
+            dd.playServices.unlockAchievement(2);
+            dd.playServices.showAchievement();
+        }
+        if (pref.getInteger("currentHighscore") >= 100 && !pref.getBoolean("pro")) {
+            dd.playServices.unlockAchievement(3);
+            dd.playServices.showAchievement();
+        }
+        if (pref.getInteger("currentHighscore") >= 500 && !pref.getBoolean("master")) {
+            dd.playServices.unlockAchievement(4);
+            dd.playServices.showAchievement();
+        }
+        if (pref.getInteger("currentHighscore") >= 1000 && !pref.getBoolean("legend")) {
+            dd.playServices.unlockAchievement(5);
             dd.playServices.showAchievement();
         }
         pref.putInteger("adCounter", pref.getInteger("adCounter") + 1);

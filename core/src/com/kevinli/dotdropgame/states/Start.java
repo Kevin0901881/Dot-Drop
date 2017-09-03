@@ -74,7 +74,7 @@ public class Start extends State implements InputProcessor{
         wordmark.setPosition(15, 15);
         star.setPosition(265, 1675);
         downarrow.setPosition(DotDrop.WIDTH / 2 - downarrow.getWidth() / 2, DotDrop.HEIGHT / 4);
-        wordmark.setAlpha(0.1f);
+        wordmark.setAlpha(0.2f);
         star.setAlpha(0.4f);
         downarrow.setAlpha(0.4f);
 

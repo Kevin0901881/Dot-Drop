@@ -7,7 +7,7 @@ package com.kevinli.dotdropgame;
 public interface PlayServices {
     public void signIn();
     public void signOut();
-    public void unlockAchievement();
+    public void unlockAchievement(int i);
     public void submitScore(int highScore);
     public void showAchievement();
     public void showScore();
