@@ -230,25 +230,20 @@ public class HighScore extends State implements InputProcessor {
         } if (!pref.contains("legend")) {
             pref.putBoolean("legend", false);
         }
-        if (pref.getInteger("currentHighscore") >= 25 && !pref.getBoolean("rookie")) {
+        if (pref.getInteger("currentHighscore") >= 5 && !pref.getBoolean("rookie")) {
             dd.playServices.unlockAchievement(1);
-            dd.playServices.showAchievement();
         }
-        if (pref.getInteger("currentHighscore") >= 50 && !pref.getBoolean("novice")) {
+        if (pref.getInteger("currentHighscore") >= 6 && !pref.getBoolean("novice")) {
             dd.playServices.unlockAchievement(2);
-            dd.playServices.showAchievement();
         }
         if (pref.getInteger("currentHighscore") >= 100 && !pref.getBoolean("pro")) {
             dd.playServices.unlockAchievement(3);
-            dd.playServices.showAchievement();
         }
         if (pref.getInteger("currentHighscore") >= 500 && !pref.getBoolean("master")) {
             dd.playServices.unlockAchievement(4);
-            dd.playServices.showAchievement();
         }
         if (pref.getInteger("currentHighscore") >= 1000 && !pref.getBoolean("legend")) {
             dd.playServices.unlockAchievement(5);
-            dd.playServices.showAchievement();
         }
         pref.putInteger("adCounter", pref.getInteger("adCounter") + 1);
         pref.flush();

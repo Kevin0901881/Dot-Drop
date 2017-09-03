@@ -186,25 +186,27 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 
 	@Override
 	public void unlockAchievement(int i) {
-		if (i == 1) {
-			Games.Achievements.unlock(gameHelper.getApiClient(),
-					getString(R.string.dot_drop_rookie));
-		}
-		if (i == 2) {
-			Games.Achievements.unlock(gameHelper.getApiClient(),
-					getString(R.string.dot_drop_novice));
-		}
-		if (i == 3) {
-			Games.Achievements.unlock(gameHelper.getApiClient(),
-					getString(R.string.dot_drop_pro));
-		}
-		if (i == 4) {
-			Games.Achievements.unlock(gameHelper.getApiClient(),
-					getString(R.string.dot_drop_master));
-		}
-		if (i == 5) {
-			Games.Achievements.unlock(gameHelper.getApiClient(),
-					getString(R.string.dot_drop_legend));
+		if (isSignedIn()) {
+			if (i == 1) {
+				Games.Achievements.unlock(gameHelper.getApiClient(),
+						getString(R.string.dot_drop_rookie));
+			}
+			if (i == 2) {
+				Games.Achievements.unlock(gameHelper.getApiClient(),
+						getString(R.string.dot_drop_novice));
+			}
+			if (i == 3) {
+				Games.Achievements.unlock(gameHelper.getApiClient(),
+						getString(R.string.dot_drop_pro));
+			}
+			if (i == 4) {
+				Games.Achievements.unlock(gameHelper.getApiClient(),
+						getString(R.string.dot_drop_master));
+			}
+			if (i == 5) {
+				Games.Achievements.unlock(gameHelper.getApiClient(),
+						getString(R.string.dot_drop_legend));
+			}
 		}
 	}
 
