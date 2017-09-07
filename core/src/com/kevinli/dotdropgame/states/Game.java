@@ -224,7 +224,7 @@ public class Game extends State {
     protected void handleInput() {
         if(Gdx.input.justTouched()) {
             for (GameDot dots : gameDots) {
-                if (dots.getn() == n && dots.getBounds().overlaps(lineBounds)) {
+                if (dots.getn() == n && dots.getBounds().overlaps(lineBounds) && !dots.getCleared()) {
                     if (pref.getInteger("volume") == 1) {
                         hit.play();
                     }
@@ -234,6 +234,8 @@ public class Game extends State {
                     gl.setText(font, scoreStr);
                     fontWidth = gl.width;
                     fontHeight = gl.height;
+                } else if (dots.getn() == n && dots.getBounds().overlaps(lineBounds)) {
+                    continue;
                 } else if (dots.getBounds().overlaps(lineBounds)) {
                     pref.putInteger("currentHighscore", score);
                     pref.flush();
