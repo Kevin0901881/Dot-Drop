@@ -1,6 +1,6 @@
 # Dot-Drop
 
-Dot Drop is a casual Android game designed to be intuitive, simple, and additive. It is created using the LibGDX framework and utilizes Google Play Game Services for leaderboards and achievements. It is published on the Google Play Store and can be downloaded here: play.google.com/store/apps/details?id=com.kevinli.dotdropgame
+Dot Drop is a casual Android game designed to be intuitive, simple, and additive. It is created using the LibGDX framework and utilizes Google Play Game Services for leaderboards and achievements. Google's Admod service is used for in-app advertisements and revenue generation.  It is published on the Google Play Store and can be downloaded here: play.google.com/store/apps/details?id=com.kevinli.dotdropgame
 
 Below is a description of the game, as pitched in the Play Store listing:
 
