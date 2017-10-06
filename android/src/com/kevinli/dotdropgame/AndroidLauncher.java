@@ -48,10 +48,10 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 
 		hideVirtualButtons();
 
-		MobileAds.initialize(this, "ca-app-pub-4100073104591330~2983194449");
+		MobileAds.initialize(this, "12345");
 
 		interstitialAd = new InterstitialAd(this);
-		interstitialAd.setAdUnitId("ca-app-pub-4100073104591330/4483978375");
+		interstitialAd.setAdUnitId("12345");
 		interstitialAd.loadAd(new AdRequest.Builder().build());
 
 		gameHelper = new GameHelper(this, GameHelper.CLIENT_GAMES);
